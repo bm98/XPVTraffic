@@ -3,6 +3,10 @@
 A library and GUI to create virtual traffic in X-Plane 11.  
 Interacts with the LiveTraffic plugin. Acts as 'RealTraffic' data provider
 
+![LiveTraffic on Map](https://raw.githubusercontent.com/bm98/XPVTraffic/master/Doc/LiveTraffic-Map.png "LiveTraffic on Map")
+
+
+
 Program Files:  
 * XPTsim.exe  - a small GUI  
 * libXPVTgen_netstd.dll - the library
@@ -12,6 +16,8 @@ Projects included:
 * XPTsim
 
 Built with Microsoft Visual Studio 2017 (free edition)  
+
+More screenshots here: https://github.com/bm98/XPVTraffic/tree/master/Doc  
 
 Note: readily available only as Win program. It connects via network i.e. should be able to run in a WinBox.  
 The library is built against .NET Standard 2.0 so you may create the GUI in any env. and recreate the application for Mac or Linux
