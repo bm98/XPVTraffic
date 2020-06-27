@@ -12,7 +12,7 @@ XPTsim (.Net 4.7.2)
 libXPVTgen_netstd(.Net Standard V2.0)
 
 Put all files into one folder and hit XPTsim.exe to run it
-see: https://github.com/SCToolsfactory/SCJoyServer
+see: https://github.com/bm98/XPVTraffic/blob/master/Doc/GUI.png
 
 For Updates and information visit:
 https://github.com/bm98/XPVTraffic
