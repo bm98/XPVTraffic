@@ -84,6 +84,26 @@ namespace libXPVTgen
       }
     }
 
+    /// <summary>
+    /// The Apt File (fully qualified)
+    /// </summary>
+    public static string AptDatPath
+    {
+      get {
+        string f = Path.Combine( CustomDataPath, "CIFP" );
+        if ( Directory.Exists( f ) ) {
+          return f;
+        }
+        f = Path.Combine( DefaultDatPath, "CIFP" );
+        if ( Directory.Exists( f ) ) {
+          return f;
+        }
+        else {
+          return "";
+        }
+      }
+    }
+
 
   }
 }

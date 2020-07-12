@@ -1,4 +1,4 @@
-# X-Plane 11 Virtual Traffic
+# X-Plane 11 Virtual Traffic V 0.8 Build 6
 
 A library and GUI to create virtual traffic in X-Plane 11.  
 Interacts with the LiveTraffic plugin. Acts as 'RealTraffic' data provider
@@ -50,19 +50,21 @@ see: https://forums.x-plane.org/index.php?/files/file/49749-livetraffic/
 
 ---
 
-#### Library features & function
+### Library features & function
 
-The library uses its own airway file derived from either the X-Plane 11 custom or default earth_fix.dat, 
-earth_nav.dat and earth_awy.dat files.  
+The library uses its own airway and runway file derived from either the X-Plane 11 custom or default earth_fix.dat, 
+earth_nav.dat, earth_awy.dat and CIFP\*.dat files.  
 While creating the file it combines the nav, fixes and airways into one file and does some housekeeping to 
 keep only valid airways.
 
 Once running it will establish the connection with the LiveTraffic plugin and 
 communicates with the 'RealTraffic' application protocol.
 
-All virtual aircrafts have a designation of **VAC-nnnn**, where nnnn is the numbered sequence since start of the program.
-The ICAO hex code is the nnnn number as well (and therefore not valid at all..)  
-e.g. VAC-0234  -> HexCode: 0000EA
+#### IFR Traffic
+
+All virtual IFR aircrafts have a designation of **VAC-nnnn**, where nnnn is the numbered sequence since start of the program.
+The ICAO hex code is the nnnn number in hex for easy tracking (and therefore not valid at all..)  
+e.g. VAC-0234  -> HexCode: 000234
 
 The program maintains 100 virtual aircrafts at any given time (`VAcftPool.cs `).  
 The aircraft type is selected from a variety of jets, props at random (`VAcft.cs`).  
@@ -81,6 +83,20 @@ For any removed aircraft a new one is created along the rules above.
 LiveTraffic shows removed aircrafts for some time but also drops them if no longer reported.  
 Note: there is a buffer delay in LiveTraffic of 90sec but not applied to the route shown as label 
 i.e. the label changes before the aircraft hits the next Fix.  
+
+#### VFR Traffic
+
+All virtual VFR aircrafts have a designation of **VGA-nnnn**, where nnnn is the numbered sequence since start of the program.
+The ICAO hex code is the nnnn number in hex for easy tracking (and therefore not valid at all..)  
+e.g. VAC-0016  -> HexCode: 000016
+
+VFR Traffic is created from script files found in the application folder 'vfrScripts' it subfolders.  
+Scripts describe a path the aircraft flies along. Turns are always standard turns.
+
+The script language can be found in the README.md of in 'vfrScripts'.
+
+For VFR traffic a simulation is provided which visualizes the track as KML file. Load it with Google Earth or a similar program that displays KML files.
+
 
 ---
 

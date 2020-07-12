@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
+using libXPVTgen.Aircrafts;
 using libXPVTgen.LiveTraffic;
 using libXPVTgen.my_awlib;
-using System.IO;
+using libXPVTgen.my_rwylib;
+using libXPVTgen.acftSim;
 
 namespace libXPVTgen
 {
@@ -24,13 +27,26 @@ namespace libXPVTgen
 
     // Traffic 
     private awyDatabase AWYDB = new awyDatabase( );
+    private rwyDatabase RWYDB = new rwyDatabase( );
+    private List<CmdList> CMDS = null;
+
     private VAcftPool POOL = null;
     // configs
-    private uint m_stepLen_sec = 10;    // update pace for LiveTraffic
+    private uint m_stepLen_sec = 2;     // update pace for LiveTraffic (use 1..3 for VFR modelling)
     private double m_radius_nm = 100.0; // Airway selection radius
+    private uint m_numAcft = 100;
+    private uint m_numVFR = 20;
+
     // my Aircraft
     private UserAcft m_userAcft = null;
     private DateTime m_lastUpdate = DateTime.Now;
+
+
+    public event EventHandler<TrafficEventArgs> TrafficEvent;
+    private void OnTraffic( long pingSeconds )
+    {
+      TrafficEvent?.Invoke( this, new TrafficEventArgs( pingSeconds ) );
+    }
 
     /// <summary>
     /// True when ready
@@ -46,16 +62,25 @@ namespace libXPVTgen
     ///       Proceed with EstablishLink
     /// </summary>
     /// <param name="dat_Path">The path to my_awy.dat</param>
-    public TrafficHandler( string dat_Path, uint stepLen_sec )
+    public TrafficHandler( string dat_Path, uint stepLen_sec, bool logging )
     {
+      Logger.Instance.Logging = logging; // user
+
 #if DEBUG
       Logger.Instance.Logging = true;
 #endif
 
-      Logger.Instance.Log( $"TrafficHandler-Create @: {DateTime.Now.ToString()}" );
-      string eawy = Path.Combine( dat_Path, DBCreator.MyDbName );
+      Logger.Instance.Log( $"TrafficHandler-Create @: {DateTime.Now.ToString( )}" );
+      string eawy = Path.Combine( dat_Path, DBCreator.MyAwyDbName );
       if ( !File.Exists( eawy ) ) {
         Error = $"Error: my_awy.dat does not exist: {eawy}";
+        Logger.Instance.Log( $"TrafficHandler: {Error}" );
+        return; // ERROR exit
+      }
+
+      string erwy = Path.Combine( dat_Path, DBCreator.MyRwyDbName );
+      if ( !File.Exists( erwy ) ) {
+        Error = $"Error: my_rwy.dat does not exist: {erwy}";
         Logger.Instance.Log( $"TrafficHandler: {Error}" );
         return; // ERROR exit
       }
@@ -65,6 +90,27 @@ namespace libXPVTgen
         Error = $"Error: my_awy.dat read failed: {ret}";
         Logger.Instance.Log( $"TrafficHandler: {Error}" );
         return; // ERROR exit
+      }
+
+      ret = rwyReader.ReadDb( ref RWYDB, erwy );
+      if ( !string.IsNullOrEmpty( ret ) ) {
+        Error = $"Error: my_rwy.dat read failed: {ret}";
+        Logger.Instance.Log( $"TrafficHandler: {Error}" );
+        return; // ERROR exit
+      }
+
+      string escript = Path.Combine( dat_Path, DBCreator.MyVfrScriptPath );
+      if ( !Directory.Exists( escript ) ) {
+        Error = $"Warning: script folder does not exist: {escript}";
+        Logger.Instance.Log( $"TrafficHandler: {Error}" );
+      }
+      else {
+        // Load Scripts
+        CMDS = CmdReader.ReadScripts( escript );
+        if ( CMDS.Count <= 0 ) {
+          Error = $"Warning: script folder does not contain valid scripts";
+          Logger.Instance.Log( $"TrafficHandler: {Error}" );
+        }
       }
 
       m_stepLen_sec = stepLen_sec;
@@ -79,10 +125,13 @@ namespace libXPVTgen
     /// </summary>
     /// <param name="hostIP">The LiveTraffic plugin host</param>
     /// <returns>True if successfull (else see Error content)</returns>
-    public bool EstablishLink( string hostIP )
+    public bool EstablishLink( string hostIP, uint numAcft, uint numVFR )
     {
       Logger.Instance.Log( $"TrafficHandler-EstablishLink to: {hostIP}" );
       if ( !Valid ) return false;
+
+      m_numAcft = numAcft;
+      m_numVFR = numVFR;
 
       m_userAcft = new UserAcft( );
       // setup Comm
@@ -93,7 +142,7 @@ namespace libXPVTgen
         LTLink = new TCPclient( m_host, RealTraffic.PortLinkTCP );
         LTLink.LTEvent += LTLink_LTEvent;
       }
-      catch (Exception e){
+      catch ( Exception e ) {
         Error = $"Error: {e.Message}";
         Logger.Instance.Log( $"TrafficHandler: {Error}" );
         return false;
@@ -123,8 +172,7 @@ namespace libXPVTgen
         m_userAcft = null;
         POOL = null;
       }
-      catch (Exception e)
-      {
+      catch ( Exception e ) {
         Error = $"Error: {e.Message}";
         Logger.Instance.Log( $"TrafficHandler: {Error}" );
       }
@@ -134,16 +182,24 @@ namespace libXPVTgen
     // Asynch processing from receiving actual user position (Triggered by TCPclient)
     private void LTLink_LTEvent( object sender, LTEventArgs e )
     {
+      long secSinceLastPing = (long)( DateTime.Now - m_lastUpdate ).TotalSeconds;
+      OnTraffic( secSinceLastPing );
+
       if ( !Valid ) return; // catch out of bounds messages
 
       m_userAcft.NewPos( e.LatLon );
       if ( POOL == null ) {
         // create the first subset with our AcftPos
-        POOL = new VAcftPool( m_stepLen_sec );
-        POOL.CreateAwySelection( AWYDB.GetTable( ), m_radius_nm, m_userAcft.LatLon );
+        POOL = new VAcftPool( m_stepLen_sec ) {
+          NumAcft = m_numAcft,
+          NumVFRcraft = m_numVFR
+        };
+        POOL.CreateAwySelection( AWYDB.GetTable( ), RWYDB.GetTable( ), m_radius_nm, m_userAcft.LatLon );
+        POOL.UpdateVFRscripts( CMDS );
+        Logger.Instance.Log( $"TrafficHandler: Create POOL with {m_numAcft} aircrafts where {m_numVFR} are VFR, one sim step is >= {m_stepLen_sec} seconds" );
       }
       // push an update only after 'StepLen_sec' secs
-      if ( ( DateTime.Now - m_lastUpdate ).TotalSeconds >= POOL.StepLen_sec ) {
+      if ( secSinceLastPing >= POOL.StepLen_sec ) {
         m_lastUpdate = DateTime.Now; // reset timer
 
         LT_Weather.SendMsg( RealTraffic.WeatherString( ) ); // send a 'generic' weather string
@@ -156,7 +212,7 @@ namespace libXPVTgen
           LT_Traffic.SendMsg( msg );
         }
         // recreates the airway selection if needed
-        POOL.UpdateAwySelection( AWYDB.GetTable( ), m_radius_nm, m_userAcft.LatLon );
+        POOL.UpdateAwySelection( AWYDB.GetTable( ), RWYDB.GetTable( ), m_radius_nm, m_userAcft.LatLon );
       }
     }
 

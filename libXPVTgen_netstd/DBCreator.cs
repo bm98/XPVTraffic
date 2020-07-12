@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using libXPVTgen.xp11_aptlib;
 using libXPVTgen.xp11_awylib;
 using libXPVTgen.xp11_navlib;
 
@@ -15,10 +17,14 @@ namespace libXPVTgen
   /// </summary>
   public class DBCreator
   {
-    public const string MyDbName = "my_awy.dat";
+    public const string MyAwyDbName = "my_awy.dat";
+    public const string MyRwyDbName = "my_rwy.dat";
+    public const string MyVfrScriptPath = "vfrScripts";
+
     // Traffic 
     private navDatabase NAVDB = new navDatabase( );
     private awyDatabase AWYDB = new awyDatabase( );
+    private aptDatabase APTDB = new aptDatabase( );
 
     public bool Valid { get; private set; } = false;
     public string Error { get; private set; } = "";
@@ -41,6 +47,10 @@ namespace libXPVTgen
       Logger.Instance.Log( $"DBCreator-AwyFile: {Error}" );
       if ( !string.IsNullOrEmpty( Error ) ) return; // ERROR exit
 
+      Error = aptReader.ReadDb( ref APTDB, XP11.AptDatPath );
+      Logger.Instance.Log( $"DBCreator-AptPath: {Error}" );
+      if ( !string.IsNullOrEmpty( Error ) ) return; // ERROR exit
+
       Valid = true;
       Logger.Instance.Log( $"DBCreator-end: Valid" );
     }
@@ -59,46 +69,23 @@ namespace libXPVTgen
         return Error; // ERROR exit
       }
 
-      string eawy = Path.Combine( myDataPath, MyDbName );
-      if ( File.Exists( eawy ) ) {
-        Error = "$Error: DB File already exists"; // ERROR exit
-        Logger.Instance.Log( $"DBCreator: {Error}" );
-        return Error;
-      }
+      // delete existing files
+      string eawy = Path.Combine( myDataPath, MyAwyDbName );
+      if ( File.Exists( eawy ) )  File.Delete( eawy );
+
+      string erwy = Path.Combine( myDataPath, MyRwyDbName );
+      if ( File.Exists( erwy ) ) File.Delete( erwy );
 
       var MYAWDB = new my_awlib.awyDatabase( );
-      foreach ( var awyrec in AWYDB.GetTable( ) ) {
-        // process all airways
-        if ( NAVDB.GetTable( ).ContainsKey( awyrec.Value.startID )
-          && NAVDB.GetTable( ).ContainsKey( awyrec.Value.endID )
-          && awyrec.Value.baselevel > 0
-          && awyrec.Value.toplevel > 0
-          && ( awyrec.Value.startID != awyrec.Value.endID ) ) {
-          // endpoints must be known and not the same, levels above 000 
-          var startFix = NAVDB.GetTable( )[awyrec.Value.startID];
-          var endFix = NAVDB.GetTable( )[awyrec.Value.endID];
-
-          if ( awyrec.Value.restriction == "F" || awyrec.Value.restriction == "N" ) {
-            // get forward path
-            var ar = new my_awlib.awyRec(
-              startFix.icao_id, startFix.icao_region, startFix.lat.ToString( ), startFix.lon.ToString( ),
-              endFix.icao_id, endFix.icao_region, endFix.lat.ToString( ), endFix.lon.ToString( ),
-              awyrec.Value.layer.ToString( ), awyrec.Value.Base_ft.ToString( ), awyrec.Value.Top_ft.ToString( ), awyrec.Value.name );
-            MYAWDB.Add( ar );
-          }
-          if ( awyrec.Value.restriction == "B" || awyrec.Value.restriction == "N" ) {
-            // get backward path
-            var ar = new my_awlib.awyRec(
-              endFix.icao_id, endFix.icao_region, endFix.lat.ToString( ), endFix.lon.ToString( ),
-              startFix.icao_id, startFix.icao_region, startFix.lat.ToString( ), startFix.lon.ToString( ),
-              awyrec.Value.layer.ToString( ), awyrec.Value.Base_ft.ToString( ), awyrec.Value.Top_ft.ToString( ), awyrec.Value.name );
-            MYAWDB.Add( ar );
-          }
-        }
-      }
-
+      MYAWDB.LoadFromX11DB( NAVDB, AWYDB );
       Error = my_awlib.awyWriter.WriteDb( MYAWDB, eawy );
-      Logger.Instance.Log( $"DBCreator-CreateDbFile ended: {Error}" );
+      Logger.Instance.Log( $"DBCreator-CreateMyAWYDB ended: {Error}" );
+
+      var MYRWYDB = new my_rwylib.rwyDatabase( );
+      MYRWYDB.LoadFromX11DB( APTDB );
+      Error = my_rwylib.rwyWriter.WriteDb( MYRWYDB, erwy );
+      Logger.Instance.Log( $"DBCreator-CreateMyRWYDB ended: {Error}" );
+
       return Error;
     }
 

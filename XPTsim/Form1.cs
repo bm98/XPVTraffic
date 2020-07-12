@@ -21,6 +21,7 @@ namespace XPTsim
     private string IP = "127.0.0.1"; // localhost default to init the GUI
     private TrafficHandler TH = null;
 
+    private long m_lastPing;
 
     public Form1()
     {
@@ -35,14 +36,44 @@ namespace XPTsim
         txBasePath.Text = FLD.SelectedPath;
       }
     }
+
+
+    private void btSimVFR_Click( object sender, EventArgs e )
+    {
+      OFD.Title = "Load VFR Model File";
+      if ( OFD.ShowDialog( this ) == DialogResult.OK ) {
+        var sim = new VFRSimulation( m_dataLocation, 2, cbxLogging.Enabled );
+        if ( sim.Valid ) {
+          btSimVFR.BackColor = Color.ForestGreen;
+
+          if ( !sim.RunSimulation( OFD.FileName ) ) {
+            lblLink.Text = sim.Error;
+            btSimVFR.BackColor = Color.IndianRed;
+          }
+          else {
+            lblLink.Text = "KML File created in script folder";
+          }
+        }
+        else {
+          // error 
+          lblLink.Text = sim.Error;
+          btSimVFR.BackColor = Color.IndianRed;
+        }
+      }
+    }
+
     private void btCreateLink_Click( object sender, EventArgs e )
     {
       btCreateLink.Enabled = false;
-      TH = new TrafficHandler( m_dataLocation, m_stepLength_Sec );
+      TH = new TrafficHandler( m_dataLocation, m_stepLength_Sec, cbxLogging.Enabled );
+
       if ( TH.Valid ) {
-        bool ret = TH.EstablishLink( IP );
+        bool ret = TH.EstablishLink( IP, (uint)numTotalAC.Value, (uint)numVFR.Value );
         if ( ret ) {
+          TH.TrafficEvent += TH_TrafficEvent;
           btCreateLink.BackColor = Color.ForestGreen;
+          timer1.Interval = 1000; // 1 sec only
+          timer1.Enabled = true;
         }
         else {
           // error on establish link
@@ -58,11 +89,20 @@ namespace XPTsim
       }
     }
 
+    private void TH_TrafficEvent( object sender, TrafficEventArgs e )
+    {
+      m_lastPing = e.PingSeconds;
+      m_pingTog = !m_pingTog;
+    }
 
     private void btDropLink_Click( object sender, EventArgs e )
     {
-      TH?.RemoveLink( );
-      if ( TH != null ) lblLink.Text = TH.Error;
+      timer1.Enabled = false;
+      if ( TH != null ) {
+        TH.TrafficEvent -= TH_TrafficEvent;
+        TH.RemoveLink( );
+        lblLink.Text = TH.Error;
+      }
       btCreateLink.BackColor = btDropLink.BackColor; // reset
       TH = null;
       btCreateLink.Enabled = true;
@@ -71,20 +111,30 @@ namespace XPTsim
     private void btCreateDB_Click( object sender, EventArgs e )
     {
       btCreateDB.Enabled = false;
-      XP11.BasePath = txBasePath.Text; // MUST be set before using DBCreator
-      var DBC = new DBCreator(  );
-      if ( DBC.Valid ) {
-        string ret = DBC.CreateDbFile( m_dataLocation );
-        if ( string.IsNullOrEmpty( ret ) )
-          lblCreate.Text = "DONE";
-        else
-          lblCreate.Text = ret;
-      }
-      else {
-        lblCreate.Text = DBC.Error;
+      if ( MessageBox.Show( $"We are about to create new database files\nThis may take a while!\nShall we continue?", "Create Database Files", MessageBoxButtons.YesNo ) == DialogResult.Yes ) {
+        XP11.BasePath = txBasePath.Text; // MUST be set before using DBCreator
+        var DBC = new DBCreator( );
+        if ( DBC.Valid ) {
+          string ret = DBC.CreateDbFile( m_dataLocation );
+          if ( string.IsNullOrEmpty( ret ) )
+            lblCreate.Text = "DONE";
+          else
+            lblCreate.Text = ret;
+        }
+        else {
+          lblCreate.Text = DBC.Error;
+        }
+
       }
       btCreateDB.Enabled = true;
     }
+
+    private bool m_pingTog = true;
+    private void timer1_Tick( object sender, EventArgs e )
+    {
+      lblPing.Text = ( m_pingTog ) ? @"/" + m_lastPing.ToString( ) : @"\" + m_lastPing.ToString( );
+    }
+
 
   }
 }

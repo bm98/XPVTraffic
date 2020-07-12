@@ -421,7 +421,6 @@ namespace libXPVTgen.coordlib
       return true;
     }
 
-
     /// <summary>
     /// Returns a string representation of ‘this’ point, formatted as degrees, degrees+minutes, or
     /// degrees+minutes+seconds.
@@ -453,6 +452,31 @@ namespace libXPVTgen.coordlib
     {
       return angleInRadians * ( 180.0 / Math.PI );
     }
+
+    /// <summary>
+    /// Returns the sum of angles reduced to a 0..360° circle
+    /// </summary>
+    public static double AddDegrees( this double angleInDegree, double otherAngle )
+    {
+      double s = angleInDegree + otherAngle;
+      while ( s > 360.0 ) { s -= 360.0; }
+      while ( s < 0.0 ) { s += 360.0; }
+
+      return s;
+    }
+
+    /// <summary>
+    /// Returns the differenc of angles reduced to a 0..360° circle
+    /// </summary>
+    public static double SubDegrees( this double angleInDegree, double otherAngle )
+    {
+      double s = angleInDegree - otherAngle;
+      while ( s > 360.0 ) { s -= 360.0; }
+      while ( s < 0.0 ) { s += 360.0; }
+
+      return s;
+    }
+
 
   }
   #endregion

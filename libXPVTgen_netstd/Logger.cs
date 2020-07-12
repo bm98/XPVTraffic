@@ -32,7 +32,7 @@ namespace libXPVTgen
       if ( !Logging ) return;
 
       using ( var sw = new StreamWriter( "libXPVTgen.log", true ) ) {
-        sw.WriteLine( entry );
+        sw.WriteLine( $"{DateTime.Now.ToLongTimeString()}: {entry}" );
       }
     }
 

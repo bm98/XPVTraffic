@@ -1,18 +1,19 @@
-XPVTraffic V 0.7 - Build 5 BETA
-(c) M.Burri - 26-Jun-2020
+XPVTraffic V 0.8 - Build 6 BETA
+(c) M.Burri - 12-Jul-2020
 
-Contains 3 files:
+Files & folders:
 
 XPTsim.exe              The program
 libXPVTgen_netstd.dll   - MUST be in the same folder as the Exe file
+
+vfrScripts\*.vsc		- Script folder and files
 
 ReadMe.txt                   This file
 
 XPTsim (.Net 4.7.2)
 libXPVTgen_netstd(.Net Standard V2.0)
 
-Put all files into one folder and hit XPTsim.exe to run it
-see: https://github.com/SCToolsfactory/SCJoyServer
+Put all files into one folder and hit XPTsim.exe to run it.
 
 For Updates and information visit:
 https://github.com/bm98/XPVTraffic
@@ -21,4 +22,11 @@ Scanned for viruses before packing...
 bm98@burri-web.org
 
 Changelog:
+V 0.8 
+- added VFR scripting and aircraft model, 
+- added Runway database from XP11 data files
+- added VFR Script simulation and KML file creation
+- improved The aircraft hexcode matches the reg number as string now e.g. VAC-0234  -> HexCode: 000234
+- improved Some GUI fixes
+---
 V 0.7 initial 

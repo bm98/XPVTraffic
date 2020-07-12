@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using libXPVTgen.coordlib;
 
-namespace libXPVTgen
+namespace libXPVTgen.Aircrafts
 {
   /// <summary>
   /// An Aircraft

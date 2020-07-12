@@ -7,11 +7,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Doc", "Doc", "{CF3EACD6-F56
 	ProjectSection(SolutionItems) = preProject
 		LICENSE = LICENSE
 		README.md = README.md
+		Doc\ReadMe.txt = Doc\ReadMe.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XPTsim", "XPTsim\XPTsim.csproj", "{D41DD72D-5163-4841-A9FD-9D108A8867FA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "libXPVTgen_netstd", "libXPVTgen_netstd\libXPVTgen_netstd.csproj", "{22BCC108-D66B-4851-B84F-42BCEB067EDA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "vfrScripts", "vfrScripts", "{3BDD51FE-ABE5-435F-82D7-1FD992C5A2F1}"
+	ProjectSection(SolutionItems) = preProject
+		vfrScripts\README.md = vfrScripts\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

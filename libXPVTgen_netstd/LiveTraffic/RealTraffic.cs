@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+
+using libXPVTgen.Aircrafts;
 using libXPVTgen.coordlib;
 
 namespace libXPVTgen.LiveTraffic
@@ -11,7 +14,7 @@ namespace libXPVTgen.LiveTraffic
   /// RealTraffic formatter 
   /// https://rtweb.flyrealtraffic.com/RTdev1.4.pdf
   /// </summary>
-  public class RealTraffic
+  internal class RealTraffic
   {
     /*
      LiveTraffic has to open a TCP port (10747 by default) to which RealTraffic connects. Once established, LiveTraffic then periodically sends its current location via this link back to RealTraffic so that RealTraffic can filter and send the traffic data of that area.
@@ -136,7 +139,9 @@ namespace libXPVTgen.LiveTraffic
       string to = $"{vac.AcftTo}";
       string ts = $"{vac.TStamp}";
       //
-      return $"AITFC,{hex},{lat},{lon},{alt},{vs},1,{hdg},{spd},{cs},{type},{tail},{from},{to},{ts}";
+      string rt = $"AITFC,{hex},{lat},{lon},{alt},{vs},1,{hdg},{spd},{cs},{type},{tail},{from},{to},{ts}";
+      //Logger.Instance.Log( rt );
+      return rt;
     }
 
 
