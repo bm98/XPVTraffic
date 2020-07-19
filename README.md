@@ -1,4 +1,4 @@
-# X-Plane 11 Virtual Traffic V 0.8 Build 6
+# X-Plane 11 Virtual Traffic V 0.9 Build 7
 
 A library and GUI to create virtual traffic in X-Plane 11.  
 Interacts with the LiveTraffic plugin. Acts as 'RealTraffic' data provider
@@ -24,19 +24,20 @@ The library is built against .NET Standard 2.0 so you may create the GUI in any 
 
 ### Quick Guide
 
-First time use:
+First time use (also applies to updates):
 * Put the library and the GUI file into any folder (best to create a new one)
+* Add VFR script files to the 'vfrScripts' folder
 * Start the GUI (XPTsim.exe)
 * Set the X-Plane 11 Base Path - use the (...) button
 * Create the application database from custom or default data files (CrateDB button), 
-this creates my_awy.dat in the application folder
+this creates my_awy.dat in the application folder (and may take a while - wait for the Done message)
 * __
 * Add the LiveTraffic plugin to X-Plane 11 (according to the authors guidance)
 * Start X-Plane 11 
 * Set the LiveTraffic plugin to accept 'RealTraffic' (again use the authors guidance)
 
 Regular use:  
-* Start X-Plane 11
+* Start X-Plane 11 and start a flight at a location
 * Start the GUI (XPTsim.exe)
 * Hit EstablishLink (button should turn green - else see the message below the button)
 * Wait until the plugin reports traffic (about after 90 sec as default)
@@ -60,22 +61,24 @@ keep only valid airways.
 Once running it will establish the connection with the LiveTraffic plugin and 
 communicates with the 'RealTraffic' application protocol.
 
+The program maintains a total of 100 (default) virtual aircrafts at any given time. Can be changed in the GUI.  
+The program maintains 20 (default) of them as 'VFR' aircrafts at any given time. Can be changed in the GUI.  
+
 #### IFR Traffic
 
-All virtual IFR aircrafts have a designation of **VAC-nnnn**, where nnnn is the numbered sequence since start of the program.
+All virtual IFR aircrafts get a callsign from the Bluebird CSL operators and a uniqe number assigned e.g. **JAL1234**.  
+The tail registration is **VX-1234** then.
 The ICAO hex code is the nnnn number in hex for easy tracking (and therefore not valid at all..)  
-e.g. VAC-0234  -> HexCode: 000234
+e.g. VX-1234  -> HexCode: 001234
 
-The program maintains 100 virtual aircrafts at any given time (`VAcftPool.cs `).  
-The aircraft type is selected from a variety of jets, props at random (`VAcft.cs`).  
+The aircraft type is selected from a variety of airliners, jets, turboprops at random.  
 The program selects airways for aircraft routes where the midpoint is within a range of 100nm of the users aircraft position (`TrafficHandler.cs`).  
-The route displayed in LiveTraffic are the start and end Fix names.  
+The route displayed in LiveTraffic are the start and end route Fix/Nav names.  
 The aircrafts use Low and High enroute segments to fly along.  
 Aircrafts maintain the segments direction restriction.  
 Aircrafts maintain the segments top and bottom FL restriction.   
-The altitude of an aircraft is created at random between bottom and top FL.     
-For now the aircrafts will not change altitude while enroute.  
-The aircrafts get an assigned TAS depending on High or Low IFR route, which is random for each aircraft but maintained all the time.  
+The altitude of an aircraft is created at random between bottom and top FL and may randomly change at the start of a new leg.     
+The aircrafts get an assigned GS depending on High or Low IFR route, which is random for each aircraft it may also change at the start of a new leg.  
 Aircrafts are preferring named routes as direction when crossing fixes.  
 If there is no further named airway segment they will divert into another airway at an angle <70°.  
 If no further segment can be used an aircraft is considered out of bound and is removed.  
@@ -86,14 +89,14 @@ i.e. the label changes before the aircraft hits the next Fix.
 
 #### VFR Traffic
 
-All virtual VFR aircrafts have a designation of **VGA-nnnn**, where nnnn is the numbered sequence since start of the program.
+All virtual VFR aircrafts get a callsign **YYYnnnn**, where nnnn is the numbered sequence since start of the program.
 The ICAO hex code is the nnnn number in hex for easy tracking (and therefore not valid at all..)  
-e.g. VAC-0016  -> HexCode: 000016
+e.g. YYY0016  -> HexCode: 000016.  The tail registration is then  **VX-0016**.
 
 VFR Traffic is created from script files found in the application folder 'vfrScripts' it subfolders.  
-Scripts describe a path the aircraft flies along. Turns are always standard turns.
+Scripts describe a path the aircraft flies along.  
 
-The script language can be found in the README.md of in 'vfrScripts'.
+The guide for the script language can be found in the README.md in 'vfrScripts'.
 
 For VFR traffic a simulation is provided which visualizes the track as KML file. Load it with Google Earth or a similar program that displays KML files.
 

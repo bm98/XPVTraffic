@@ -17,7 +17,9 @@ namespace libXPVTgen.LiveTraffic
   internal class RealTraffic
   {
     /*
-     LiveTraffic has to open a TCP port (10747 by default) to which RealTraffic connects. Once established, LiveTraffic then periodically sends its current location via this link back to RealTraffic so that RealTraffic can filter and send the traffic data of that area.
+     LiveTraffic has to open a TCP port (10747 by default) to which RealTraffic connects. 
+     Once established, LiveTraffic then periodically sends its current location via this link back to RealTraffic so that 
+     RealTraffic can filter and send the traffic data of that area.
     */
     /// <summary>
     /// The LinkPort - Connect to LifeTraffic and receive messages
@@ -31,6 +33,7 @@ namespace libXPVTgen.LiveTraffic
     /// The Traffic port to send traffic to LifeTraffic
     /// </summary>
     public const int PortTrafficUDP = 49003;
+
     /*
      * is the port on which RealTraffic periodically sends weather data
      */
@@ -69,7 +72,7 @@ namespace libXPVTgen.LiveTraffic
       if ( !linkString.Contains( "Qs121=" ) ) return false; // not enough
 
       // cheap... actually expensive CPU
-      while(!linkString.StartsWith( "Qs121=" ) ) {
+      while ( !linkString.StartsWith( "Qs121=" ) ) {
         linkString = linkString.Substring( 1 );
       }
       // Have a Qs starter now
@@ -78,7 +81,7 @@ namespace libXPVTgen.LiveTraffic
 
       // remove from linkString 
       int len = 0;
-      for (int i = 0; i < 8; i++ ) {
+      for ( int i = 0; i < 8; i++ ) {
         len += e[i].Length;
       }
       len += 7; // div chars
@@ -91,7 +94,7 @@ namespace libXPVTgen.LiveTraffic
       if ( double.TryParse( e[6], out double lat ) && double.TryParse( e[7], out double lon ) ) {
         latLon.Lat = lat.ToDegrees( );
         latLon.Lon = lon.ToDegrees( );
-        retval= true;
+        retval = true;
       }
 
       return retval;
@@ -125,22 +128,12 @@ namespace libXPVTgen.LiveTraffic
     /// <returns>An AI-Traffic string to send to LiveTraffic</returns>
     public static string AITrafficString( VAcft vac )
     {
-      string hex = $"{vac.AcftHex}";
-      string lat = $"{vac.LatLon.Lat:##0.000000}";
-      string lon = $"{vac.LatLon.Lon:##0.000000}";
-      string alt = $"{vac.Alt_ft}";
-      string vs = $"{vac.VSI}";
-      string hdg = $"{vac.HDG:##0.0}";
-      string spd = $"{vac.TAS:##0.0}";
-      string cs = $"{vac.ID}";
-      string type = $"{vac.AcftType}";
-      string tail = $"{vac.ID}";
-      string from = $"{vac.AcftFrom}";
-      string to = $"{vac.AcftTo}";
-      string ts = $"{vac.TStamp}";
+      string airborne = ( vac.Airborne ) ? "1" : "0";
       //
-      string rt = $"AITFC,{hex},{lat},{lon},{alt},{vs},1,{hdg},{spd},{cs},{type},{tail},{from},{to},{ts}";
-      //Logger.Instance.Log( rt );
+      string rt = $"AITFC,{vac.AcftHex},{vac.LatLon.Lat:##0.0000000},{vac.LatLon.Lon:##0.0000000},{vac.Alt_ft},{(int)vac.VSI}"
+        + $",{airborne},{vac.TRK:##0.0},{vac.GS:##0.0}"
+        + $",{vac.AcftCallsign},{vac.AcftType},{vac.AcftTailReg}"
+        + $",{vac.AcftFrom},{vac.AcftTo},{vac.TStamp}";
       return rt;
     }
 

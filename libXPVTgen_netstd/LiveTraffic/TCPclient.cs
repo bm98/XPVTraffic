@@ -83,6 +83,7 @@ namespace libXPVTgen.LiveTraffic
           Disconnect( );
           return false;
         }
+        m_tcpClient.ReceiveBufferSize = 120; // minimize the rec buffer to about one message i.e. throttle the sender
         m_nStream = m_tcpClient.GetStream( );
         if ( !m_nStream.CanRead ) {
           Error = "Cannot read from stream";
@@ -90,7 +91,7 @@ namespace libXPVTgen.LiveTraffic
           return false;
         }
         m_nStream.WriteTimeout = 5_000; // we don't actually write..
-        m_nStream.ReadTimeout = 5_000; // 5 sec, should receive 1..5/sec
+        m_nStream.ReadTimeout = 5_000; // 5 sec, should receive 1..5/sec (LT paces way higher than this..)
         m_byteBuffer = new byte[m_tcpClient.ReceiveBufferSize];
       }
       catch ( SocketException se ) {
@@ -205,7 +206,7 @@ namespace libXPVTgen.LiveTraffic
 
     /// <summary>
     /// Task Routine: Processes the clients requests (TCP stream)
-    /// This just makes one receive round and returns to the clientdispatcher
+    /// Loops until aborted
     /// </summary>
     private void ProcessNetworkStream()
     {
@@ -222,7 +223,8 @@ namespace libXPVTgen.LiveTraffic
             if ( ( newTick - lastTick ).TotalSeconds > 1 ) {
               m_positions.Enqueue( latlon );
               m_are.Set( ); // work to do
-              lastTick = newTick; 
+              lastTick = newTick;
+              Thread.Sleep( 1000 ); // Try to throttle down the sender (it comes at a high pace causing too high CPU demand for the purpose)
             }
           }
         }

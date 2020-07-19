@@ -19,13 +19,13 @@ namespace libXPVTgen.my_awlib
     public string end_icao_id = "";       //04 Identifier of enroute fix or navaid at the beginning of this segment
     public string end_icao_region = "";   //05 ICAO region code of enroute NDB or terminal area airport Must be region code according to ICAO document No. 7910 
     public LatLon end_latlon = new LatLon( );
-    public short layer = 0;             //08 This is a "High" airway (1 = "low", 2 = "high"). 
-                                        //   If an airway segment is both High and Low, then it should be listed twice( once in each category ). 
-                                        //   This determines if the airway is shown on X-Plane's "High Enroute" or "Low Enroute" charts
-    public int baseFt = 0;         //09 Base of airway in hundreds of feet (18000 ft in this example) Integer between 0 and 600
-    public int topFt = 60000;          //10 Top of airways in hundreds of feet (45000 ft in this example) Integer between 0 and 600
-    public string segments = "";        //11 Airway segment name. Up to five characters per name, names separated by hyphens
-                                      //  If multiple airways share this segment, then all names will be included separated by a hyphen( eg. "J13-J14-J15")
+    public short layer = 0;               //08 This is a "High" airway (1 = "low", 2 = "high"). 
+                                          //   If an airway segment is both High and Low, then it should be listed twice( once in each category ). 
+                                          //   This determines if the airway is shown on X-Plane's "High Enroute" or "Low Enroute" charts
+    public int baseFt = 0;                //09 Base of airway in hundreds of feet (18000 ft in this example) Integer between 0 and 600
+    public int topFt = 60000;             //10 Top of airways in hundreds of feet (45000 ft in this example) Integer between 0 and 600
+    public string segments = "";          //11 Airway segment name. Up to five characters per name, names separated by hyphens
+                                          //  If multiple airways share this segment, then all names will be included separated by a hyphen( eg. "J13-J14-J15")
     public LatLon mid_latlon = new LatLon( );
     public float brg = 0;   //  bearing start to end
     public string startID = "";
@@ -39,6 +39,7 @@ namespace libXPVTgen.my_awlib
                    string lay, string bFt, string tFt, string seg )
     {
 #if !DEBUG
+      // catch XP11 db insconsistencies while debugging
       try {
 #endif
       start_icao_id = sid.ToUpperInvariant( );
@@ -72,7 +73,7 @@ namespace libXPVTgen.my_awlib
     /// <returns>An independent copy of this record</returns>
     public awyRec DeepCopy()
     {
-      var awr =(awyRec) this.MemberwiseClone( );
+      var awr = (awyRec)this.MemberwiseClone( );
       // need to alloc new LatLons
       awr.start_latlon = new LatLon( this.start_latlon );
       awr.end_latlon = new LatLon( this.end_latlon );
@@ -84,6 +85,16 @@ namespace libXPVTgen.my_awlib
     /// returns true if the record is valid
     /// </summary>
     public bool IsValid { get => !string.IsNullOrEmpty( ident ); }
+
+    /// <summary>
+    /// Returns the distance from start to end latLon
+    /// </summary>
+    public double Distance_nm
+    {
+      get {
+        return start_latlon.DistanceTo( end_latlon, ConvConsts.EarthRadiusNm );
+      }
+    }
 
 
     public override string ToString()

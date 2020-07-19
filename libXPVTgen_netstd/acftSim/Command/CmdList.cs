@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+
 using System.Text;
+using libXPVTgen.coordlib;
+using libXPVTgen.my_rwylib;
 
 namespace libXPVTgen.acftSim
 {
@@ -23,7 +27,7 @@ namespace libXPVTgen.acftSim
     /// <param name="array"></param>
     public CmdList( CmdBase[] array )
     {
-      for (int i=0; i<array.Length; i++ ) {
+      for ( int i = 0; i < array.Length; i++ ) {
         this.Enqueue( array[i] );
       }
     }
@@ -41,33 +45,28 @@ namespace libXPVTgen.acftSim
     /// <summary>
     /// Returns true if the list is empty
     /// </summary>
-    public bool IsEmpty { get => this.Count < 1; }
+    public bool IsEmpty { get => this.Count < 2; } // must have A and E (2 elements at least)
 
-  
     /// <summary>
-    /// Return a Runway_ID if available, else an empty string
+    /// Returns true if the list is valid
     /// </summary>
-    public string Runway_ID
+    public bool IsValid
     {
       get {
-        if ( this.Peek( ) is CmdA ) {
-          return ( this.Peek( ) as CmdA ).RwyID;
-        }
-        return "";
+        if ( IsEmpty ) return false;
+        if ( !( this.First( ) is CmdA && this.Last( ) is CmdE ) ) return false;
+        // more checks ??
+        return true;
       }
     }
 
-    /// <summary>
-    /// Return a Runway_ID if available, else an empty string
-    /// </summary>
-    public string AircraftType
+    public CmdA Descriptor
     {
       get {
-        if ( this.Peek( ) is CmdA ) {
-          return ( this.Peek( ) as CmdA ).AcftType;
-        }
-        return "";
+        if ( ( this.Count > 0 ) && ( this.Peek( ) is CmdA ) ) return this.Peek( ) as CmdA;
+        throw new NotSupportedException( "CmdList.Descriptor - CmdA element not found" ); // this is a program error..
       }
     }
+
   }
 }

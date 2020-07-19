@@ -53,6 +53,9 @@
       this.label5 = new System.Windows.Forms.Label();
       this.groupBox1 = new System.Windows.Forms.GroupBox();
       this.groupBox2 = new System.Windows.Forms.GroupBox();
+      this.btSimIFR = new System.Windows.Forms.Button();
+      this.lblVersion = new System.Windows.Forms.Label();
+      this.btDumpIFR = new System.Windows.Forms.Button();
       ((System.ComponentModel.ISupportInitialize)(this.numTotalAC)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.numVFR)).BeginInit();
       this.groupBox1.SuspendLayout();
@@ -88,7 +91,7 @@
       // 
       // btCreateLink
       // 
-      this.btCreateLink.Location = new System.Drawing.Point(16, 86);
+      this.btCreateLink.Location = new System.Drawing.Point(15, 102);
       this.btCreateLink.Name = "btCreateLink";
       this.btCreateLink.Size = new System.Drawing.Size(86, 39);
       this.btCreateLink.TabIndex = 3;
@@ -98,7 +101,7 @@
       // 
       // btDropLink
       // 
-      this.btDropLink.Location = new System.Drawing.Point(331, 86);
+      this.btDropLink.Location = new System.Drawing.Point(330, 102);
       this.btDropLink.Name = "btDropLink";
       this.btDropLink.Size = new System.Drawing.Size(86, 39);
       this.btDropLink.TabIndex = 3;
@@ -127,7 +130,7 @@
       // label2
       // 
       this.label2.AutoSize = true;
-      this.label2.Location = new System.Drawing.Point(13, 12);
+      this.label2.Location = new System.Drawing.Point(12, 28);
       this.label2.Name = "label2";
       this.label2.Size = new System.Drawing.Size(115, 13);
       this.label2.TabIndex = 1;
@@ -135,7 +138,7 @@
       // 
       // txIP
       // 
-      this.txIP.Location = new System.Drawing.Point(130, 9);
+      this.txIP.Location = new System.Drawing.Point(129, 25);
       this.txIP.Name = "txIP";
       this.txIP.Size = new System.Drawing.Size(128, 22);
       this.txIP.TabIndex = 6;
@@ -145,7 +148,7 @@
       this.lblLink.AutoEllipsis = true;
       this.lblLink.BackColor = System.Drawing.Color.OldLace;
       this.lblLink.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-      this.lblLink.Location = new System.Drawing.Point(16, 128);
+      this.lblLink.Location = new System.Drawing.Point(15, 144);
       this.lblLink.Name = "lblLink";
       this.lblLink.Size = new System.Drawing.Size(401, 71);
       this.lblLink.TabIndex = 5;
@@ -162,7 +165,7 @@
             0,
             0,
             0});
-      this.numTotalAC.Location = new System.Drawing.Point(16, 58);
+      this.numTotalAC.Location = new System.Drawing.Point(15, 74);
       this.numTotalAC.Maximum = new decimal(new int[] {
             200,
             0,
@@ -185,7 +188,7 @@
       // label3
       // 
       this.label3.AutoSize = true;
-      this.label3.Location = new System.Drawing.Point(13, 42);
+      this.label3.Location = new System.Drawing.Point(12, 58);
       this.label3.Name = "label3";
       this.label3.Size = new System.Drawing.Size(80, 13);
       this.label3.TabIndex = 8;
@@ -194,7 +197,7 @@
       // label4
       // 
       this.label4.AutoSize = true;
-      this.label4.Location = new System.Drawing.Point(129, 42);
+      this.label4.Location = new System.Drawing.Point(128, 58);
       this.label4.Name = "label4";
       this.label4.Size = new System.Drawing.Size(88, 13);
       this.label4.TabIndex = 10;
@@ -202,7 +205,7 @@
       // 
       // numVFR
       // 
-      this.numVFR.Location = new System.Drawing.Point(132, 58);
+      this.numVFR.Location = new System.Drawing.Point(131, 74);
       this.numVFR.Name = "numVFR";
       this.numVFR.Size = new System.Drawing.Size(63, 22);
       this.numVFR.TabIndex = 9;
@@ -215,7 +218,7 @@
       // cbxLogging
       // 
       this.cbxLogging.AutoSize = true;
-      this.cbxLogging.Location = new System.Drawing.Point(356, 14);
+      this.cbxLogging.Location = new System.Drawing.Point(355, 30);
       this.cbxLogging.Name = "cbxLogging";
       this.cbxLogging.Size = new System.Drawing.Size(61, 17);
       this.cbxLogging.TabIndex = 11;
@@ -244,7 +247,7 @@
       // lblPing
       // 
       this.lblPing.AutoSize = true;
-      this.lblPing.Location = new System.Drawing.Point(112, 112);
+      this.lblPing.Location = new System.Drawing.Point(111, 128);
       this.lblPing.Name = "lblPing";
       this.lblPing.Size = new System.Drawing.Size(16, 13);
       this.lblPing.TabIndex = 13;
@@ -274,7 +277,7 @@
       this.groupBox1.Controls.Add(this.txBasePath);
       this.groupBox1.Controls.Add(this.label1);
       this.groupBox1.Controls.Add(this.btBasePath);
-      this.groupBox1.Location = new System.Drawing.Point(8, 281);
+      this.groupBox1.Location = new System.Drawing.Point(7, 297);
       this.groupBox1.Name = "groupBox1";
       this.groupBox1.Size = new System.Drawing.Size(419, 118);
       this.groupBox1.TabIndex = 16;
@@ -283,21 +286,55 @@
       // 
       // groupBox2
       // 
+      this.groupBox2.Controls.Add(this.btSimIFR);
       this.groupBox2.Controls.Add(this.btSimVFR);
       this.groupBox2.Controls.Add(this.txRwy);
       this.groupBox2.Controls.Add(this.label5);
-      this.groupBox2.Location = new System.Drawing.Point(12, 202);
+      this.groupBox2.Location = new System.Drawing.Point(11, 218);
       this.groupBox2.Name = "groupBox2";
       this.groupBox2.Size = new System.Drawing.Size(419, 73);
       this.groupBox2.TabIndex = 17;
       this.groupBox2.TabStop = false;
       this.groupBox2.Text = "VFR Script Simulation";
       // 
+      // btSimIFR
+      // 
+      this.btSimIFR.Location = new System.Drawing.Point(319, 21);
+      this.btSimIFR.Name = "btSimIFR";
+      this.btSimIFR.Size = new System.Drawing.Size(94, 39);
+      this.btSimIFR.TabIndex = 16;
+      this.btSimIFR.Text = "Simulate IFR Model";
+      this.btSimIFR.UseVisualStyleBackColor = true;
+      this.btSimIFR.Visible = false;
+      this.btSimIFR.Click += new System.EventHandler(this.btSimIFR_Click);
+      // 
+      // lblVersion
+      // 
+      this.lblVersion.AutoSize = true;
+      this.lblVersion.Location = new System.Drawing.Point(12, -1);
+      this.lblVersion.Name = "lblVersion";
+      this.lblVersion.Size = new System.Drawing.Size(16, 13);
+      this.lblVersion.TabIndex = 18;
+      this.lblVersion.Text = "...";
+      // 
+      // btDumpIFR
+      // 
+      this.btDumpIFR.Location = new System.Drawing.Point(330, 58);
+      this.btDumpIFR.Name = "btDumpIFR";
+      this.btDumpIFR.Size = new System.Drawing.Size(86, 39);
+      this.btDumpIFR.TabIndex = 19;
+      this.btDumpIFR.Text = "Dump IFR Scripts";
+      this.btDumpIFR.UseVisualStyleBackColor = true;
+      this.btDumpIFR.Visible = false;
+      this.btDumpIFR.Click += new System.EventHandler(this.btDumpIFR_Click);
+      // 
       // Form1
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(439, 404);
+      this.ClientSize = new System.Drawing.Size(439, 424);
+      this.Controls.Add(this.btDumpIFR);
+      this.Controls.Add(this.lblVersion);
       this.Controls.Add(this.groupBox2);
       this.Controls.Add(this.groupBox1);
       this.Controls.Add(this.lblPing);
@@ -316,6 +353,8 @@
       this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.Name = "Form1";
       this.Text = "XP11 Virtual Live Traffic";
+      this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+      this.Load += new System.EventHandler(this.Form1_Load);
       ((System.ComponentModel.ISupportInitialize)(this.numTotalAC)).EndInit();
       ((System.ComponentModel.ISupportInitialize)(this.numVFR)).EndInit();
       this.groupBox1.ResumeLayout(false);
@@ -353,6 +392,9 @@
     private System.Windows.Forms.Label label5;
     private System.Windows.Forms.GroupBox groupBox1;
     private System.Windows.Forms.GroupBox groupBox2;
+    private System.Windows.Forms.Label lblVersion;
+    private System.Windows.Forms.Button btSimIFR;
+    private System.Windows.Forms.Button btDumpIFR;
   }
 }
 

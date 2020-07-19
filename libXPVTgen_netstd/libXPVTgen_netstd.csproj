@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Virtual traffic library for X-Plane 11 LiveTraffic plugin</Description>
-    <AssemblyVersion>0.8.0.6</AssemblyVersion>
-    <FileVersion>0.7.0.6</FileVersion>
+    <AssemblyVersion>0.9.0.7</AssemblyVersion>
+    <FileVersion>0.9.0.7</FileVersion>
     <Authors>M.Burri</Authors>
     <Company />
     <Copyright>(c) 2020 M.Burri</Copyright>

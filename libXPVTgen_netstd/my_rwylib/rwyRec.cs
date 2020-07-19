@@ -62,10 +62,14 @@ namespace libXPVTgen.my_rwylib
       return awr;
     }
 
+    /// <summary>
+    /// Returns the record as string
+    /// </summary>
+    /// <returns>A string</returns>
     public override string ToString()
     {
       /*   0  1  2   3      4        5        6        7
-         LSZH,14,R,1452,42.395806,8.320987,42.395847,832456 
+         LSZH,14,R,1452,42.395806,8.320987,42.395847,8.32456 
      */
       return $"{icao_id},{rwy_num},{rwy_side},{elevation},"
            + $"{start_latlon.Lat},{start_latlon.Lon},"

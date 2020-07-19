@@ -1,5 +1,5 @@
-XPVTraffic V 0.8 - Build 6 BETA
-(c) M.Burri - 12-Jul-2020
+XPVTraffic V 0.9 - Build 7 BETA
+(c) M.Burri - 16-Jul-2020
 
 Files & folders:
 
@@ -24,11 +24,25 @@ Scanned for viruses before packing...
 bm98@burri-web.org
 
 Changelog:
+V 0.9Build7
+- add Persist user settings
+- add User settings for number of aircrafts supported
+- add Logging debug support
+- add Readme/Guide for Script Language
+- add Optional scripting for accel and turnrates, new Msl Alt mode
+- update Throttle the LT sender to avoid excess CPU usage
+- update Use script and model for IFR flight creation
+- update Refactor aircraft, sim parts, review/update comments
+- update Some misleading names
+- update Use Bluebird CSL supported aircrafts and operators for IFR flights
+- update Provide callsign, tail registration and airborne tag to LT
+- fix Change to ground speed (GS) naming to match AITRAFFIC format
+
 V 0.8 
 - added VFR scripting and aircraft model, 
 - added Runway database from XP11 data files
 - added VFR Script simulation and KML file creation
 - improved The aircraft hexcode matches the reg number as string now e.g. VAC-0234  -> HexCode: 000234
 - improved Some GUI fixes
----
+
 V 0.7 initial 

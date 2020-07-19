@@ -2,9 +2,9 @@
 # VFR Route Script
 # 20200704/BM
 #
-A=C172 # a new C172
+A=C172      # a new C172
 S=95        # init TAS at 95 kts
-V=10;100  # climb to 1000 ft AGL @ 500ft/Min
+V=10;100    # climb to 1000 ft AGL @ 500ft/Min
 D=0.2
 V=500;1000  # climb to 1000 ft AGL @ 500ft/Min
 D=2.0       # go straight for 2nm
@@ -12,7 +12,7 @@ T=-180      # turn -180°
 D=4.5         # go straight for 4nm
 T=-180      # turn -180°
 S=60        # slow to TAS 60 kts
-V=-400;0    # descend to 0 ft AGL @ -400ft/Min
+V=400;0     # descend to 0 ft AGL @ 400ft/Min
 D=2.2       # go straight for 2.2nm / land ????
 S=20        # slow to TAS 20 kts
 D=0.5       # go straight for 0.5nm

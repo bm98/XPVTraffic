@@ -31,7 +31,8 @@ namespace libXPVTgen
     private List<CmdList> CMDS = null;
 
     private VAcftPool POOL = null;
-    // configs
+
+    // config defaults
     private uint m_stepLen_sec = 2;     // update pace for LiveTraffic (use 1..3 for VFR modelling)
     private double m_radius_nm = 100.0; // Airway selection radius
     private uint m_numAcft = 100;
@@ -64,12 +65,14 @@ namespace libXPVTgen
     /// <param name="dat_Path">The path to my_awy.dat</param>
     public TrafficHandler( string dat_Path, uint stepLen_sec, bool logging )
     {
+      Logger.Instance.Reset( );
       Logger.Instance.Logging = logging; // user
 
 #if DEBUG
+      // always log in DEBUG mode
       Logger.Instance.Logging = true;
 #endif
-
+      // Load Database files if possible, else exit with Error
       Logger.Instance.Log( $"TrafficHandler-Create @: {DateTime.Now.ToString( )}" );
       string eawy = Path.Combine( dat_Path, DBCreator.MyAwyDbName );
       if ( !File.Exists( eawy ) ) {
@@ -207,7 +210,7 @@ namespace libXPVTgen
         POOL.ReGenerate( );
         POOL.Update( );
         // send updates to LiveTraffic - TODO need to pace it ??
-        foreach ( var vac in POOL.AircraftPool ) {
+        foreach ( var vac in POOL.AircraftPoolRef ) {
           string msg = RealTraffic.AITrafficString( vac );
           LT_Traffic.SendMsg( msg );
         }

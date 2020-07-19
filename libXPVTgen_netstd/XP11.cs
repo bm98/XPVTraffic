@@ -85,7 +85,7 @@ namespace libXPVTgen
     }
 
     /// <summary>
-    /// The Apt File (fully qualified)
+    /// The Apt Path (fully qualified)
     /// </summary>
     public static string AptDatPath
     {

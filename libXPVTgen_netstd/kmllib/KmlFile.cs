@@ -28,26 +28,26 @@ namespace libXPVTgen.kmllib
       return true;
     }
 
-
+    /// <summary>
+    /// Returns the complete file as list of KML lines
+    /// </summary>
+    /// <returns>List of KML lines</returns>
     public List<string> AsStringList()
     {
-      List<string> ret = new List<string>( );
-
-      ret.Add( @"<?xml version=""1.0"" encoding=""UTF-8""?>" );
-      ret.Add( @"<kml xmlns=""http://www.opengis.net/kml/2.2"">" );
-      ret.Add( @"  <Document>" );
-      ret.Add( @"    <name>XPVTraffic KML Routes</name>" );
-      ret.Add( @"    <open>1</open>" );
+      List<string> ret = new List<string> {
+        @"<?xml version=""1.0"" encoding=""UTF-8""?>",
+        @"<kml xmlns=""http://www.opengis.net/kml/2.2"">",
+        @"  <Document>",
+        @"    <name>XPVTraffic KML Routes</name>",
+        @"    <open>1</open>"
+      };
       ret.AddRange( Styles.AsString( ) );
-      ret.Add( @"    <Folder>" );
-      ret.Add( @"    <name>VFR Routes</name>" );
       foreach ( var pm in Placemarks ) {
         ret.AddRange( pm.AsStringList( ) );
       }
       foreach ( var l in Lines ) {
         ret.AddRange( l.AsStringList( ) );
       }
-      ret.Add( @"    </Folder>" );
       ret.Add( @"  </Document>" );
       ret.Add( @"</kml>" );
       return ret;

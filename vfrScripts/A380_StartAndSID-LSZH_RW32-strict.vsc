@@ -1,0 +1,46 @@
+# Simple01.vsc
+# VFR Route Script
+# A380 takeoff SID DEGES 3L from RWY 32 (Strict, cannot use a random rwy)
+# 20200718/BM
+#
+A=A388;LSZH_RW32;S  # a new A380
+M=1          # use MSL altitudes from now on
+S=160;3      # accel to rotate...
+D=1.2        # 1.2 nm on the runway.. should get us to about 160kt
+S=180;5      # speed up
+V=1500;3500  # rotate and climb to 3500
+D=2.0        # -> D2.0
+V=1400;3500  # reduce VSI if not yet on 3500
+H=330        # turn to 330°
+D=2.0        # -> D4.0
+H=244        # turn to 244°
+V=1300;4600  # climb to 4600
+S=200;5      # speed up
+D=4.0        # ->TRA@190 intercept (about that distance..)
+H=190;2      # flat turn to 190°
+V=1200;5200  # climb to 5200
+H=88;2       # flat turn to 88°
+D=5          # ->KLO (about that distance..)
+V=1200;8200  # climb to 8200
+H=85         # std turn to 85°
+D=5.1        # ->MOMOL
+D=6.2        # ->KOLUL
+H=100        # std turn to 85°
+D=3.1        # ->ZH504
+D=4.7        # ->ZH525
+D=8.0        # ->DEGES
+# then use TRA Northbound direction EDDF
+V=1000;18000 # climb to FL180
+H=59         # std turn to 59°
+D=9.0        # ->ROMGA
+S=350;5      # get some speed...
+H=17         # std turn to 17°
+D=6.0        # ->BODAN
+H=1          # std turn to 1°
+D=13.0       # ->ALAGO
+H=359        # std turn to 359°
+D=10.0       # ->BIKBI
+D=12.0       # ->MINGA
+D=22.0       # ->SUDEN
+D=12.0       # ->ETAGO
+# End of script, acft will be removed

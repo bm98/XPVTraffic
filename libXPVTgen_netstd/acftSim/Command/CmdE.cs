@@ -5,10 +5,13 @@ using System.Text;
 namespace libXPVTgen.acftSim
 {
   /// <summary>
-  /// Aircraft Command
+  /// End Command; signals end of script
   /// </summary>
   class CmdE : CmdBase
   {
+    /// <summary>
+    /// cTor:
+    /// </summary>
     public CmdE()
     {
       Cmd = Cmd.E;

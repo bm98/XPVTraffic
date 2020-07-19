@@ -2,7 +2,7 @@
 # VFR Route Script
 # 20200704/BM
 #
-A=PC6T  # a new PC6
+A=PC9;LSZU_RW34  # a new PC9
 S=95        # init TAS at 95 kts
 V=10;100    # Slow climb to show takeoff
 D=0.2
@@ -22,11 +22,11 @@ D=18        # go straight for 18nm
 T=60        # turn 60°
 D=6         # go straight for 6nm
 T=180       # turn 180°
-V=-800;2200 # descend to 2200 ft AGL @ -800ft/Min
+V=800;2200  # descend to 2200 ft AGL @ 800ft/Min
 D=6         # go straight for 6nm
 T=-60       # turn -60°
 V=300;3000  # climb to 3000 ft AGL @ 300ft/Min
 D=26        # go straight for 26nm
 H=90        # turn to heading 90°
-V=-400;2800 # descend to 2800 ft AGL @ -400ft/Min
+V=400;2800  # descend to 2800 ft AGL @ 400ft/Min
 D=20        # go straight for 20nm (then the acft is removed)

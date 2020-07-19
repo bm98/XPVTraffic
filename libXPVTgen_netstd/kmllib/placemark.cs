@@ -16,13 +16,18 @@ namespace libXPVTgen.kmllib
     public string Name = "";
     public string Description = "";
 
+    /// <summary>
+    /// Returns the placemark as list of KML lines
+    /// </summary>
+    /// <returns>A list of KML lines</returns>
     public List<string> AsStringList()
     {
-      var ret = new List<string>( );
-      ret.Add( $"<Placemark>" );
-      ret.Add( $"  <name>{Name}</name>" );
-      ret.Add( $"  <visibility>0</visibility>" );
-      ret.Add( $"  <description>{Description}</ description > " );
+      var ret = new List<string> {
+        $"<Placemark>",
+        $"  <name>{Name}</name>",
+        $"  <visibility>0</visibility>",
+        $"  <description>{Description}</ description > "
+      };
       ret.AddRange( Point.AsLookAtList( ) );
       ret.Add( $"  <styleUrl>#globeIcon</styleUrl>" );
       ret.Add( $"  <Point>" );

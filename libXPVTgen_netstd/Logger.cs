@@ -7,9 +7,14 @@ using System.Threading.Tasks;
 
 namespace libXPVTgen
 {
+  /// <summary>
+  /// A simple debug logger
+  /// </summary>
   internal class Logger
   {
-
+    /// <summary>
+    /// Simple singleton
+    /// </summary>
     public static Logger Instance
     {
       get {
@@ -25,14 +30,33 @@ namespace libXPVTgen
 
     // CLASS
 
+    /// <summary>
+    /// Turn Logging on/off
+    /// </summary>
     public bool Logging { get; set; } = false;
 
+    /// <summary>
+    /// Reset the logfile, backup the current one
+    /// </summary>
+    public void Reset()
+    {
+      try {
+        if ( File.Exists( "libXPVTgen.bak" ) ) File.Delete( "libXPVTgen.bak" );
+        File.Move( "libXPVTgen.log", "libXPVTgen.bak" );
+      }
+      catch { }
+    }
+
+    /// <summary>
+    /// Log  a line
+    /// </summary>
+    /// <param name="entry"></param>
     public void Log( string entry )
     {
       if ( !Logging ) return;
 
       using ( var sw = new StreamWriter( "libXPVTgen.log", true ) ) {
-        sw.WriteLine( $"{DateTime.Now.ToLongTimeString()}: {entry}" );
+        sw.WriteLine( $"{DateTime.Now.ToLongTimeString( )}: {entry}" );
       }
     }
 

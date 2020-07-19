@@ -10,11 +10,12 @@ using libXPVTgen.my_awlib;
 using libXPVTgen.my_rwylib;
 using libXPVTgen.acftSim;
 using libXPVTgen.kmllib;
+using libXPVTgen.coordlib;
 
 namespace libXPVTgen
 {
   /// <summary>
-  /// Used to simulate one VFR Flight and create a KML file for it
+  /// Used to simulate one VFR script or a random IFR flight and create a KML file for it
   /// </summary>
   public class VFRSimulation
   {
@@ -24,7 +25,7 @@ namespace libXPVTgen
     private List<CmdList> CMDS = null;
 
     // configs
-    private uint m_stepLen_sec = 2;     // update pace for LiveTraffic (use 1..3 for VFR modelling)
+    private int m_stepLen_sec = 2;     // update pace for LiveTraffic (use 1..3 for VFR modelling)
 
     // my Aircraft
     private UserAcft m_userAcft = null;
@@ -44,8 +45,9 @@ namespace libXPVTgen
     ///       Proceed with EstablishLink
     /// </summary>
     /// <param name="dat_Path">The path to my_awy.dat</param>
-    public VFRSimulation( string dat_Path, uint stepLen_sec, bool logging )
+    public VFRSimulation( string dat_Path, int stepLen_sec, bool logging )
     {
+      Logger.Instance.Reset();
       Logger.Instance.Logging = logging; // user
 
 #if DEBUG
@@ -101,29 +103,89 @@ namespace libXPVTgen
     }
 
     /// <summary>
+    /// Dump the first 100 random IFR script start,end names
+    /// </summary>
+    public void DumpIFR()
+    {
+      var awys = AWYDB.GetSubtable( 100, 47.17, 8.5 ); // just around here..
+      using ( var sw = new StreamWriter( "IFRscrips.log", false ) ) {
+        for ( int i = 0; i < 100; i++ ) {
+          var route = IFRroute.GetRandomFlight( awys, 1, "A333", "SIM" );
+          sw.WriteLine( $"{i:000}\t{route.Descriptor.Start_IcaoID}\t{route.Descriptor.End_IcaoID}" );
+        }
+      }
+    }
+
+    /// <summary>
+    /// Create and run one random IFR Flight Sim and write a KML of it
+    /// - just for testing..
+    /// </summary>
+    /// <returns>True if OK</returns>
+    public bool RunIFRSim()
+    {
+      var awys = AWYDB.GetSubtable( 100, 47.17, 8.5 ); // just around here..
+      var route = IFRroute.GetRandomFlight( awys, 1, "A333", "SIM" );
+      return RunSimFromScript( route );
+    }
+
+    /// <summary>
+    /// Run one route script with an IFR model aircraft
+    /// </summary>
+    /// <param name="route">A complete route script to run</param>
+    /// <returns>True if OK</returns>
+    private bool RunSimFromScript( CmdList route )
+    {
+      string routeName = route.Descriptor.Start_IcaoID + "_" + route.Descriptor.End_IcaoID;
+
+      var virtAcft = new IFRvAcft( route ); // use the Jet model
+      var kmlFile = new KmlFile( );
+      var kmlLine = new line {
+        Name = routeName,
+        LineColor = LineStyle.LT_Blue
+      };
+      do {
+        virtAcft.StepModel( m_stepLen_sec ); // step the model at 2 sec until finished
+
+        kmlLine.Add( new point {
+          Position = new LatLon( virtAcft.LatLon ),
+          Altitude_ft = virtAcft.Alt_ft,
+          Heading = (int)virtAcft.TRK
+        } );
+
+      } while ( !virtAcft.Out );
+      // setup Comm
+      kmlFile.Lines.Add( kmlLine );
+      kmlFile.WriteKML( routeName + ".kml" );
+      return Valid;
+    }
+
+
+    /// <summary>
     /// Simulate the Model file given and write a kmlfile of the path
     /// same folder as the model file with the extension .kml
     /// </summary>
     /// <param name="vfrModelFile">The VFR Model File</param>
     /// <returns>True if successfull (else see Error content)</returns>
-    public bool RunSimulation( string vfrModelFile )
+    public bool RunSimulation( string vfrModelFile, string fallBackRwy )
     {
       Error = "";
       Logger.Instance.Log( $"VFRSimulation-SetupSimulation for: {vfrModelFile}" );
       if ( !Valid ) return false;
 
-      var cmd = CmdReader.ReadCmdScript( vfrModelFile );
-      if ( cmd.IsEmpty ) {
+      var route = CmdReader.ReadCmdScript( vfrModelFile );
+      if ( !route.IsValid ) {
         Valid = false;
         Error = "File not found or invalid content";
         Logger.Instance.Log( Error );
         return false;
       }
 
-      var rwy = RWYDB.GetSubtable( cmd.Runway_ID );
+      string rwID = route.Descriptor.RunwayPreference; // preferred one
+      if ( string.IsNullOrEmpty( rwID ) ) rwID = fallBackRwy;
+      var rwy = RWYDB.GetSubtable( rwID ); // search RWY
       if ( rwy.Count < 1 ) {
         Valid = false;
-        Error = $"Runway: {cmd.Runway_ID} not found in Runway database, cannot continue";
+        Error = $"Runway: {route.Descriptor.Start_IcaoID} not found in Runway database, cannot continue";
         Logger.Instance.Log( Error );
         return false;
       }
@@ -132,18 +194,21 @@ namespace libXPVTgen
       m_userAcft.NewPos( rwy.ElementAt( 0 ).Value.start_latlon );
 
       // the simulated aircraft
-      var virtAcft = new VFRvAcft( Path.GetFileNameWithoutExtension( vfrModelFile ), rwy.ElementAt( 0 ).Value, cmd, cmd.AircraftType, "000001" );
+      route.Descriptor.InitFromRunway( 1, rwy.ElementAt( 0 ).Value ); // Complete the script
+
+      var virtAcft = new VFRvAcft( route ); // use the GA model
       var kmlFile = new KmlFile( );
       var kmlLine = new line {
-        Name = Path.GetFileNameWithoutExtension( vfrModelFile )
+        Name = Path.GetFileNameWithoutExtension( vfrModelFile ),
+        LineColor = LineStyle.LT_Yellow
       };
       do {
-        virtAcft.StepModel( 2 ); // step the model at 2 sec until finished
+        virtAcft.StepModel( m_stepLen_sec ); // step the model at 2 sec until finished
 
         kmlLine.Add( new point {
-          Position = new coordlib.LatLon( virtAcft.LatLon ),
+          Position = new LatLon( virtAcft.LatLon ),
           Altitude_ft = virtAcft.Alt_ft,
-          Heading = (int)rwy.ElementAt( 0 ).Value.brg
+          Heading = (int)virtAcft.TRK
         } );
 
       } while ( !virtAcft.Out );
