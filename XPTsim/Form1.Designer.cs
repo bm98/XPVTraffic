@@ -56,12 +56,12 @@
       this.lblVersion = new System.Windows.Forms.Label();
       this.btDumpIFR = new System.Windows.Forms.Button();
       this.groupBox3 = new System.Windows.Forms.GroupBox();
+      this.cbxIgnoreAirborne = new System.Windows.Forms.CheckBox();
       this.cbxAbsolutePos = new System.Windows.Forms.CheckBox();
       this.cbxConvertFile = new System.Windows.Forms.CheckBox();
       this.lblConvert = new System.Windows.Forms.Label();
       this.btConvertAIT = new System.Windows.Forms.Button();
       this.lblLink = new System.Windows.Forms.RichTextBox();
-      this.cbxIgnoreAirborne = new System.Windows.Forms.CheckBox();
       ((System.ComponentModel.ISupportInitialize)(this.numTotalAC)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.numVFR)).BeginInit();
       this.groupBox1.SuspendLayout();
@@ -195,9 +195,9 @@
       this.label4.AutoSize = true;
       this.label4.Location = new System.Drawing.Point(128, 58);
       this.label4.Name = "label4";
-      this.label4.Size = new System.Drawing.Size(88, 13);
+      this.label4.Size = new System.Drawing.Size(87, 13);
       this.label4.TabIndex = 10;
-      this.label4.Text = "Number of VFR:";
+      this.label4.Text = "#Scripted Acfts:";
       // 
       // numVFR
       // 
@@ -339,6 +339,16 @@
       this.groupBox3.TabStop = false;
       this.groupBox3.Text = "AITraffic Converter";
       // 
+      // cbxIgnoreAirborne
+      // 
+      this.cbxIgnoreAirborne.AutoSize = true;
+      this.cbxIgnoreAirborne.Location = new System.Drawing.Point(244, 43);
+      this.cbxIgnoreAirborne.Name = "cbxIgnoreAirborne";
+      this.cbxIgnoreAirborne.Size = new System.Drawing.Size(133, 17);
+      this.cbxIgnoreAirborne.TabIndex = 17;
+      this.cbxIgnoreAirborne.Text = "Ignore Airborne Flag";
+      this.cbxIgnoreAirborne.UseVisualStyleBackColor = true;
+      // 
       // cbxAbsolutePos
       // 
       this.cbxAbsolutePos.AutoSize = true;
@@ -352,6 +362,8 @@
       // cbxConvertFile
       // 
       this.cbxConvertFile.AutoSize = true;
+      this.cbxConvertFile.Checked = true;
+      this.cbxConvertFile.CheckState = System.Windows.Forms.CheckState.Checked;
       this.cbxConvertFile.Location = new System.Drawing.Point(105, 21);
       this.cbxConvertFile.Name = "cbxConvertFile";
       this.cbxConvertFile.Size = new System.Drawing.Size(104, 17);
@@ -386,16 +398,6 @@
       this.lblLink.Size = new System.Drawing.Size(401, 65);
       this.lblLink.TabIndex = 21;
       this.lblLink.Text = "";
-      // 
-      // cbxIgnoreAirborne
-      // 
-      this.cbxIgnoreAirborne.AutoSize = true;
-      this.cbxIgnoreAirborne.Location = new System.Drawing.Point(244, 43);
-      this.cbxIgnoreAirborne.Name = "cbxIgnoreAirborne";
-      this.cbxIgnoreAirborne.Size = new System.Drawing.Size(133, 17);
-      this.cbxIgnoreAirborne.TabIndex = 17;
-      this.cbxIgnoreAirborne.Text = "Ignore Airborne Flag";
-      this.cbxIgnoreAirborne.UseVisualStyleBackColor = true;
       // 
       // Form1
       // 

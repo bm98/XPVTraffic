@@ -43,6 +43,11 @@ namespace libXPVTgen.Aircrafts
     public uint NumVFRcraft { get; set; } = 20;
 
     /// <summary>
+    /// The selection range
+    /// </summary>
+    public double Range_nm { get; private set; } = 100;
+
+    /// <summary>
     /// The Step Length to update Virt Aircrafts for LiveTraffic [sec]
     /// </summary>
     public uint StepLen_sec { get; private set; } = 10; // default
@@ -89,8 +94,9 @@ namespace libXPVTgen.Aircrafts
     /// cTor: Init the pool
     /// </summary>
     /// <param name="stepLen_sec">Use stepLen [sec] as update pace</param>
-    public VAcftPool( uint stepLen_sec )
+    public VAcftPool( double range_nm, uint stepLen_sec )
     {
+      Range_nm = range_nm;
       StepLen_sec = stepLen_sec;
       m_lastTime = DateTime.Now;
     }
@@ -107,11 +113,11 @@ namespace libXPVTgen.Aircrafts
     /// <param name="rwysRef">All Runways</param>
     /// <param name="radius_nm">Selection radius [nm]</param>
     /// <param name="acftPos">Position to select Airways from</param>
-    public void CreateAwySelection( awyTable awysRef, rwyTable rwysRef, double radius_nm, LatLon acftPos )
+    public void CreateAwySelection( awyTable awysRef, rwyTable rwysRef, LatLon acftPos )
     {
       m_userPos = new LatLon( acftPos );
-      m_awysSelected = awysRef.GetSubtable( radius_nm, m_userPos.Lat, m_userPos.Lon );
-      m_rwysSelected = rwysRef.GetSubtable( radius_nm / 2.0, m_userPos.Lat, m_userPos.Lon ); // runways only around half the radius
+      m_awysSelected = awysRef.GetSubtable( Range_nm, m_userPos.Lat, m_userPos.Lon );
+      m_rwysSelected = rwysRef.GetSubtable( Range_nm / 2.0, m_userPos.Lat, m_userPos.Lon ); // runways only around half the radius
     }
 
     /// <summary>
@@ -122,13 +128,13 @@ namespace libXPVTgen.Aircrafts
     /// <param name="rwysRef">All Runways</param>
     /// <param name="radius_nm">Selection radius [nm]</param>
     /// <param name="acftPos">Position to select Airways from</param>
-    public void UpdateAwySelection( awyTable awysRef, rwyTable rwysRef, double radius_nm, LatLon acftPos )
+    public void UpdateAwySelection( awyTable awysRef, rwyTable rwysRef, LatLon acftPos )
     {
       // update if further away than 1/4 radius
-      if ( m_userPos.DistanceTo( acftPos, ConvConsts.EarthRadiusNm ) > ( radius_nm / 4 ) ) {
+      if ( m_userPos.DistanceTo( acftPos, ConvConsts.EarthRadiusNm ) > ( Range_nm / 4 ) ) {
         m_userPos = new LatLon( acftPos );
-        m_awysSelected = awysRef.GetSubtable( radius_nm, m_userPos.Lat, m_userPos.Lon );
-        m_rwysSelected = rwysRef.GetSubtable( radius_nm / 2.0, m_userPos.Lat, m_userPos.Lon ); // runways only around half the radius
+        m_awysSelected = awysRef.GetSubtable( Range_nm, m_userPos.Lat, m_userPos.Lon );
+        m_rwysSelected = rwysRef.GetSubtable( Range_nm / 2.0, m_userPos.Lat, m_userPos.Lon ); // runways only around half the radius
       }
     }
 
@@ -202,19 +208,21 @@ namespace libXPVTgen.Aircrafts
             var rwy = GetRandomRwy( "", false );
             if ( rwy == null ) return; // no runways available ??
             // the simulated aircraft
-            route.Descriptor.InitFromMsgRelative( m_acftIndex++, rwy, "SIM" ); // Complete the script
+            route.Descriptor.InitFromMsgRelative( m_acftIndex++, rwy, "YYY" ); // Complete the script
             var vac = new VFRvAcft( route );
             m_pool.Add( vac );
             m_numVFR++;
             Logger.Instance.Log( $"VAcftPool-MsgRel:     {vac.ID} - {vac.AcftFrom} - {vac.AcftTo}" );
           }
           else if ( route.Descriptor.FlightType == CmdA.FlightT.MsgAbsolute ) {
-            // the simulated aircraft
-            route.Descriptor.InitFromMsgAbsolute( m_acftIndex++, "SIM" ); // Complete the script
+            if ( m_userPos.DistanceTo( route.Descriptor.StartPos_latlon, ConvConsts.EarthRadiusNm ) > Range_nm ) return; // the starting point is out of range
+            // the simulated aircraft is in range
+            route.Descriptor.InitFromMsgAbsolute( m_acftIndex++, "YYY" ); // Complete the script
             var vac = new VFRvAcft( route );
             m_pool.Add( vac );
             m_numVFR++;
             Logger.Instance.Log( $"VAcftPool-MsgAbs:     {vac.ID} - {vac.AcftFrom} - {vac.AcftTo}" );
+
           }
         }
       }

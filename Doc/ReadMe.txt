@@ -26,6 +26,7 @@ bm98@burri-web.org
 Changelog:
 V 0.9Build9
 - add conversion of AITraffic files to scripts
+- add a number of recorded ADS-B flights converted to relative scripts
 - update Refacture Scripting classes and modes for AIT conversions
 - update GUI and settings for conversion of AIT files
 - fix Sim Model issues with GS=0

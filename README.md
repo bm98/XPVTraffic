@@ -1,4 +1,4 @@
-# X-Plane 11 Virtual Traffic V 0.9 Build 8
+# X-Plane 11 Virtual Traffic V 0.9 Build 9
 
 A library and GUI to create virtual traffic in X-Plane 11.  
 Interacts with the LiveTraffic plugin. Acts as 'RealTraffic' data provider
@@ -64,7 +64,7 @@ communicates with the 'RealTraffic' application protocol.
 The program maintains a total of 100 (default) virtual aircrafts at any given time. Can be changed in the GUI.  
 The program maintains 20 (default) of them as 'VFR' aircrafts at any given time. Can be changed in the GUI.  
 
-#### IFR Traffic
+#### Traffic created from the Airway database (IFR)
 
 All virtual IFR aircrafts get a callsign from the Bluebird CSL operators and a uniqe number assigned e.g. **JAL1234**.  
 The tail registration is **VX-1234** then.
@@ -72,7 +72,7 @@ The ICAO hex code is the nnnn number in hex for easy tracking (and therefore not
 e.g. VX-1234  -> HexCode: 001234
 
 The aircraft type is selected from a variety of airliners, jets, turboprops at random.  
-The program selects airways for aircraft routes where the midpoint is within a range of 100nm of the users aircraft position (`TrafficHandler.cs`).  
+The program selects airways for aircraft routes where the midpoint is within a range of 100nm of the users aircraft position.  
 The route displayed in LiveTraffic are the start and end route Fix/Nav names.  
 The aircrafts use Low and High enroute segments to fly along.  
 Aircrafts maintain the segments direction restriction.  
@@ -80,26 +80,34 @@ Aircrafts maintain the segments top and bottom FL restriction.
 The altitude of an aircraft is created at random between bottom and top FL and may randomly change at the start of a new leg.     
 The aircrafts get an assigned GS depending on High or Low IFR route, which is random for each aircraft it may also change at the start of a new leg.  
 Aircrafts are preferring named routes as direction when crossing fixes.  
-If there is no further named airway segment they will divert into another airway at an angle <70°.  
+If there is no further named airway segment they will divert into another airway at an angle <150°.  
 If no further segment can be used an aircraft is considered out of bound and is removed.  
 For any removed aircraft a new one is created along the rules above.  
 LiveTraffic shows removed aircrafts for some time but also drops them if no longer reported.  
 Note: there is a buffer delay in LiveTraffic of 90sec but not applied to the route shown as label 
 i.e. the label changes before the aircraft hits the next Fix.  
 
-#### VFR Traffic
+#### Traffic created from Scripts
 
-All virtual VFR aircrafts get a callsign **YYYnnnn**, where nnnn is the numbered sequence since start of the program.
+All virtual aircrafts created from scripts get a callsign **YYYnnnn**, where nnnn is the numbered sequence since start of the program.
 The ICAO hex code is the nnnn number in hex for easy tracking (and therefore not valid at all..)  
 e.g. YYY0016  -> HexCode: 000016.  The tail registration is then  **VX-0016**.
 
-VFR Traffic is created from script files found in the application folder 'vfrScripts' it subfolders.  
+Such traffic is created from script files found in the application folder 'vfrScripts' it subfolders.  
 Scripts describe a path the aircraft flies along.  
 
 The guide for the script language can be found in the README.md in 'vfrScripts'.
 
-For VFR traffic a simulation is provided which visualizes the track as KML file. Load it with Google Earth or a similar program that displays KML files.
+For scripted traffic a simulation is provided which visualizes the track as KML file.
+Load it with Google Earth or a similar program that displays KML files.
 
+#### Conversion of AITraffic files to scripts
+
+There is a conversion from AITraffic file (AITFC=...) to scripts.  
+
+Included are a number of converted ADS-B flight recordings (from my own receiver, no business terms violated). 
+The KML included is not the original flight track, all are relocated starting from LSZH RWY28 (this is what relative conversion allows). 
+While running such scripts as virtual traffic they will have an origin and bearing from random runways in range.
 
 ---
 

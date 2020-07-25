@@ -193,11 +193,11 @@ namespace libXPVTgen
       m_userAcft.NewPos( e.LatLon );
       if ( POOL == null ) {
         // create the first subset with our AcftPos
-        POOL = new VAcftPool( m_stepLen_sec ) {
+        POOL = new VAcftPool( m_radius_nm, m_stepLen_sec ) {
           NumAcft = m_numAcft,
           NumVFRcraft = m_numVFR
         };
-        POOL.CreateAwySelection( AWYDB.GetTable( ), RWYDB.GetTable( ), m_radius_nm, m_userAcft.LatLon );
+        POOL.CreateAwySelection( AWYDB.GetTable( ), RWYDB.GetTable( ), m_userAcft.LatLon );
         POOL.UpdateVFRscripts( CMDS );
         Logger.Instance.Log( $"TrafficHandler: Create POOL with {m_numAcft} aircrafts where {m_numVFR} are VFR, one sim step is >= {m_stepLen_sec} seconds" );
       }
@@ -215,7 +215,7 @@ namespace libXPVTgen
           LT_Traffic.SendMsg( msg );
         }
         // recreates the airway selection if needed
-        POOL.UpdateAwySelection( AWYDB.GetTable( ), RWYDB.GetTable( ), m_radius_nm, m_userAcft.LatLon );
+        POOL.UpdateAwySelection( AWYDB.GetTable( ), RWYDB.GetTable( ), m_userAcft.LatLon );
       }
     }
 
