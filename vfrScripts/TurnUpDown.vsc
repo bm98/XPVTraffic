@@ -2,7 +2,7 @@
 # VFR Route Script
 # 20200704/BM
 #
-A=C172;LSZH_RW28  # a new Cessna 172, start from LSZH_RW28 (if it is found in range)
+A=C172;Runway;LSZH_RW28  # a new Cessna 172, start from LSZH_RW28 (if it is found in range)
 S=95        # init TAS at 95 kts
 V=10;100    # Slow climb to show takeoff
 D=0.2

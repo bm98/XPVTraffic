@@ -13,8 +13,6 @@ namespace libXPVTgen.Aircrafts
   /// </summary>
   internal class VFRvAcft : VAcft
   {
-    // Selection of GA Aircraft types avilable from the Bluebird CSL library (may be extend for heuristic GAs in LiveTraffic)
-    public static List<string> GA_AircraftTypes = new List<string>( ) { "C150", "C172", "C421", "BE20", "PC9" };
 
 
     // CLASS
@@ -29,7 +27,7 @@ namespace libXPVTgen.Aircrafts
       : base( route )
     {
       // select the Flight model according to acft type (use the types above for GA)
-      if ( GA_AircraftTypes.Contains( route.Descriptor.AircraftType ) ) {
+      if ( AircraftSelection.GA_AircraftTypes.Contains( route.Descriptor.AircraftType ) ) {
         m_model = new GAModel( route );
       }
       else {

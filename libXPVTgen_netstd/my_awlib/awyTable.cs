@@ -190,8 +190,8 @@ namespace libXPVTgen.my_awlib
           // not a continuation, change airway then but only at some angle
           float diversion = seg.brg - leg.Value.brg;
           if ( diversion < 0 ) diversion += 360.0f;
-          if ( diversion < 70.0f ) {
-            // this is a some decent continuation (max brg diff is 70°)
+          if ( diversion < 150.0f ) {
+            // this is a some decent continuation (max brg diff is 150°)
             leglist.Add( leg.Value );
           }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace libXPVTgen.acftSim
@@ -30,5 +31,13 @@ namespace libXPVTgen.acftSim
   {
     public Cmd Cmd { get; set; } = Cmd.X;
 
+    /// <summary>
+    /// Write the Command to the stream
+    /// </summary>
+    /// <param name="stream">The output stream</param>
+    abstract public void WriteToStream( StreamWriter stream );
+
   }
+
+
 }

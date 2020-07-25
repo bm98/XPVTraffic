@@ -1,5 +1,5 @@
-XPVTraffic V 0.9 - Build 7 BETA
-(c) M.Burri - 16-Jul-2020
+XPVTraffic V 0.9 - Build 9 BETA
+(c) M.Burri - 25-Jul-2020
 
 Files & folders:
 
@@ -24,6 +24,18 @@ Scanned for viruses before packing...
 bm98@burri-web.org
 
 Changelog:
+V 0.9Build9
+- add conversion of AITraffic files to scripts
+- update Refacture Scripting classes and modes for AIT conversions
+- update GUI and settings for conversion of AIT files
+- fix Sim Model issues with GS=0
+- fix Wrong entries in Aircraft Selections
+
+V 0.9Build8
+- update Calculate proper turns for IFR scripts
+- update Allow for up to 150 deg angles of IFR continuation segments and avoid loops
+- fix Error in Script P command
+
 V 0.9Build7
 - add Persist user settings
 - add User settings for number of aircrafts supported

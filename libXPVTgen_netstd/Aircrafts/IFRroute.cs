@@ -30,7 +30,7 @@ namespace libXPVTgen.Aircrafts
     {
       double gs = 180;
       if ( layer == 1 ) { // low
-        gs = m_random.Next( 140, 210 ); // some variations is tas..
+        gs = m_random.Next( 160, 210 ); // some variations is tas..
       }
       else if ( layer == 2 ) { // high
         gs = m_random.Next( 250, 420 ); // some variations is tas..
@@ -67,26 +67,28 @@ namespace libXPVTgen.Aircrafts
     public static CmdList GetRandomFlight( awyTable awyTableRef, int acftNo, string acftType, string airline )
     {
       var route = new CmdList( );
+      var visited = new List<string>( );  // visited Navs and Fixes, we don't want to run circles
+
       var awy = GetRandomAwy( awyTableRef );
       if ( awy == null ) return route; // no airways available ??
 
       // add Aircraft Descriptor first
-      route.Enqueue( new CmdA( acftType, airline ) );
+      route.Enqueue( new CmdA( acftType, CmdA.FlightT.Airway, airline ) );
       // some random altitude and complete start of the route
       var altMsl = m_random.Next( awy.baseFt, awy.topFt );
       altMsl = (int)Math.Round( altMsl / 100.0 ) * 100; // get 100 ft increments
-      route.Descriptor.InitFromAirway( acftNo, awy, altMsl );   // set start conditions (assumes MslBase=0)
-
-      // add absolute Alt command mode i.e. altitudes in V commands are all MSL based
-      route.Enqueue( new CmdM( true) );
-      // add speed command
-      route.Enqueue( new CmdS( GetSpeed( awy.layer ) ) );
+      route.Descriptor.InitFromAirway( acftNo, awy, altMsl, GetSpeed( awy.layer ) );   // set start conditions (assumes MslBase=0)
       // add segment length command
       route.Enqueue( new CmdD( awy.Distance_nm ) );
+      visited.Add( awy.startID ); // we add all startIDs
 
       // do we have an airway to go from here?
       var newleg = awyTableRef.GetNextSegment( awy );
       while ( newleg != null ) {
+        if (visited.Contains( newleg.startID ) ) {
+          break; // this would create a circle (endless loop)
+        }
+
         awy = newleg;
         // random speed change
         if ( m_random.Next( 10 ) == 0 ) {
@@ -101,6 +103,7 @@ namespace libXPVTgen.Aircrafts
         }
         // ass Goto command
         route.Enqueue( new CmdG( awy.end_latlon ) );
+        visited.Add( awy.startID ); // we add all startIDs
 
         // try next one
         newleg = awyTableRef.GetNextSegment( awy );

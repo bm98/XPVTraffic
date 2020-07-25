@@ -38,7 +38,6 @@
       this.lblCreate = new System.Windows.Forms.Label();
       this.label2 = new System.Windows.Forms.Label();
       this.txIP = new System.Windows.Forms.TextBox();
-      this.lblLink = new System.Windows.Forms.Label();
       this.FLD = new System.Windows.Forms.FolderBrowserDialog();
       this.numTotalAC = new System.Windows.Forms.NumericUpDown();
       this.label3 = new System.Windows.Forms.Label();
@@ -56,10 +55,18 @@
       this.btSimIFR = new System.Windows.Forms.Button();
       this.lblVersion = new System.Windows.Forms.Label();
       this.btDumpIFR = new System.Windows.Forms.Button();
+      this.groupBox3 = new System.Windows.Forms.GroupBox();
+      this.cbxAbsolutePos = new System.Windows.Forms.CheckBox();
+      this.cbxConvertFile = new System.Windows.Forms.CheckBox();
+      this.lblConvert = new System.Windows.Forms.Label();
+      this.btConvertAIT = new System.Windows.Forms.Button();
+      this.lblLink = new System.Windows.Forms.RichTextBox();
+      this.cbxIgnoreAirborne = new System.Windows.Forms.CheckBox();
       ((System.ComponentModel.ISupportInitialize)(this.numTotalAC)).BeginInit();
       ((System.ComponentModel.ISupportInitialize)(this.numVFR)).BeginInit();
       this.groupBox1.SuspendLayout();
       this.groupBox2.SuspendLayout();
+      this.groupBox3.SuspendLayout();
       this.SuspendLayout();
       // 
       // txBasePath
@@ -142,17 +149,6 @@
       this.txIP.Name = "txIP";
       this.txIP.Size = new System.Drawing.Size(128, 22);
       this.txIP.TabIndex = 6;
-      // 
-      // lblLink
-      // 
-      this.lblLink.AutoEllipsis = true;
-      this.lblLink.BackColor = System.Drawing.Color.OldLace;
-      this.lblLink.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-      this.lblLink.Location = new System.Drawing.Point(15, 144);
-      this.lblLink.Name = "lblLink";
-      this.lblLink.Size = new System.Drawing.Size(401, 71);
-      this.lblLink.TabIndex = 5;
-      this.lblLink.Text = "...";
       // 
       // FLD
       // 
@@ -255,16 +251,17 @@
       // 
       // txRwy
       // 
-      this.txRwy.Location = new System.Drawing.Point(118, 31);
+      this.txRwy.Location = new System.Drawing.Point(103, 38);
       this.txRwy.Name = "txRwy";
       this.txRwy.Size = new System.Drawing.Size(87, 22);
       this.txRwy.TabIndex = 14;
       this.txRwy.Text = "NZWN_RW16";
+      this.txRwy.TextChanged += new System.EventHandler(this.txRwy_TextChanged);
       // 
       // label5
       // 
       this.label5.AutoSize = true;
-      this.label5.Location = new System.Drawing.Point(211, 34);
+      this.label5.Location = new System.Drawing.Point(102, 22);
       this.label5.Name = "label5";
       this.label5.Size = new System.Drawing.Size(93, 13);
       this.label5.TabIndex = 15;
@@ -277,7 +274,7 @@
       this.groupBox1.Controls.Add(this.txBasePath);
       this.groupBox1.Controls.Add(this.label1);
       this.groupBox1.Controls.Add(this.btBasePath);
-      this.groupBox1.Location = new System.Drawing.Point(7, 297);
+      this.groupBox1.Location = new System.Drawing.Point(11, 376);
       this.groupBox1.Name = "groupBox1";
       this.groupBox1.Size = new System.Drawing.Size(419, 118);
       this.groupBox1.TabIndex = 16;
@@ -328,11 +325,85 @@
       this.btDumpIFR.Visible = false;
       this.btDumpIFR.Click += new System.EventHandler(this.btDumpIFR_Click);
       // 
+      // groupBox3
+      // 
+      this.groupBox3.Controls.Add(this.cbxIgnoreAirborne);
+      this.groupBox3.Controls.Add(this.cbxAbsolutePos);
+      this.groupBox3.Controls.Add(this.cbxConvertFile);
+      this.groupBox3.Controls.Add(this.lblConvert);
+      this.groupBox3.Controls.Add(this.btConvertAIT);
+      this.groupBox3.Location = new System.Drawing.Point(11, 297);
+      this.groupBox3.Name = "groupBox3";
+      this.groupBox3.Size = new System.Drawing.Size(419, 73);
+      this.groupBox3.TabIndex = 20;
+      this.groupBox3.TabStop = false;
+      this.groupBox3.Text = "AITraffic Converter";
+      // 
+      // cbxAbsolutePos
+      // 
+      this.cbxAbsolutePos.AutoSize = true;
+      this.cbxAbsolutePos.Location = new System.Drawing.Point(244, 21);
+      this.cbxAbsolutePos.Name = "cbxAbsolutePos";
+      this.cbxAbsolutePos.Size = new System.Drawing.Size(122, 17);
+      this.cbxAbsolutePos.TabIndex = 16;
+      this.cbxAbsolutePos.Text = "Absolute Positions";
+      this.cbxAbsolutePos.UseVisualStyleBackColor = true;
+      // 
+      // cbxConvertFile
+      // 
+      this.cbxConvertFile.AutoSize = true;
+      this.cbxConvertFile.Location = new System.Drawing.Point(105, 21);
+      this.cbxConvertFile.Name = "cbxConvertFile";
+      this.cbxConvertFile.Size = new System.Drawing.Size(104, 17);
+      this.cbxConvertFile.TabIndex = 15;
+      this.cbxConvertFile.Text = "Single File only";
+      this.cbxConvertFile.UseVisualStyleBackColor = true;
+      // 
+      // lblConvert
+      // 
+      this.lblConvert.AutoSize = true;
+      this.lblConvert.Location = new System.Drawing.Point(100, 47);
+      this.lblConvert.Name = "lblConvert";
+      this.lblConvert.Size = new System.Drawing.Size(16, 13);
+      this.lblConvert.TabIndex = 14;
+      this.lblConvert.Text = "...";
+      // 
+      // btConvertAIT
+      // 
+      this.btConvertAIT.Location = new System.Drawing.Point(6, 21);
+      this.btConvertAIT.Name = "btConvertAIT";
+      this.btConvertAIT.Size = new System.Drawing.Size(86, 39);
+      this.btConvertAIT.TabIndex = 13;
+      this.btConvertAIT.Text = "Convert AITraffic";
+      this.btConvertAIT.UseVisualStyleBackColor = true;
+      this.btConvertAIT.Click += new System.EventHandler(this.btConvertAIT_Click);
+      // 
+      // lblLink
+      // 
+      this.lblLink.BackColor = System.Drawing.Color.OldLace;
+      this.lblLink.Location = new System.Drawing.Point(15, 147);
+      this.lblLink.Name = "lblLink";
+      this.lblLink.Size = new System.Drawing.Size(401, 65);
+      this.lblLink.TabIndex = 21;
+      this.lblLink.Text = "";
+      // 
+      // cbxIgnoreAirborne
+      // 
+      this.cbxIgnoreAirborne.AutoSize = true;
+      this.cbxIgnoreAirborne.Location = new System.Drawing.Point(244, 43);
+      this.cbxIgnoreAirborne.Name = "cbxIgnoreAirborne";
+      this.cbxIgnoreAirborne.Size = new System.Drawing.Size(133, 17);
+      this.cbxIgnoreAirborne.TabIndex = 17;
+      this.cbxIgnoreAirborne.Text = "Ignore Airborne Flag";
+      this.cbxIgnoreAirborne.UseVisualStyleBackColor = true;
+      // 
       // Form1
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(439, 424);
+      this.ClientSize = new System.Drawing.Size(439, 502);
+      this.Controls.Add(this.lblLink);
+      this.Controls.Add(this.groupBox3);
       this.Controls.Add(this.btDumpIFR);
       this.Controls.Add(this.lblVersion);
       this.Controls.Add(this.groupBox2);
@@ -344,7 +415,6 @@
       this.Controls.Add(this.label3);
       this.Controls.Add(this.numTotalAC);
       this.Controls.Add(this.txIP);
-      this.Controls.Add(this.lblLink);
       this.Controls.Add(this.btDropLink);
       this.Controls.Add(this.btCreateLink);
       this.Controls.Add(this.label2);
@@ -361,6 +431,8 @@
       this.groupBox1.PerformLayout();
       this.groupBox2.ResumeLayout(false);
       this.groupBox2.PerformLayout();
+      this.groupBox3.ResumeLayout(false);
+      this.groupBox3.PerformLayout();
       this.ResumeLayout(false);
       this.PerformLayout();
 
@@ -377,7 +449,6 @@
     private System.Windows.Forms.Label lblCreate;
     private System.Windows.Forms.Label label2;
     private System.Windows.Forms.TextBox txIP;
-    private System.Windows.Forms.Label lblLink;
     private System.Windows.Forms.FolderBrowserDialog FLD;
     private System.Windows.Forms.NumericUpDown numTotalAC;
     private System.Windows.Forms.Label label3;
@@ -395,6 +466,13 @@
     private System.Windows.Forms.Label lblVersion;
     private System.Windows.Forms.Button btSimIFR;
     private System.Windows.Forms.Button btDumpIFR;
+    private System.Windows.Forms.GroupBox groupBox3;
+    private System.Windows.Forms.Button btConvertAIT;
+    private System.Windows.Forms.CheckBox cbxConvertFile;
+    private System.Windows.Forms.Label lblConvert;
+    private System.Windows.Forms.CheckBox cbxAbsolutePos;
+    private System.Windows.Forms.RichTextBox lblLink;
+    private System.Windows.Forms.CheckBox cbxIgnoreAirborne;
   }
 }
 

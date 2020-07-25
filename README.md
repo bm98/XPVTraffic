@@ -1,4 +1,4 @@
-# X-Plane 11 Virtual Traffic V 0.9 Build 7
+# X-Plane 11 Virtual Traffic V 0.9 Build 8
 
 A library and GUI to create virtual traffic in X-Plane 11.  
 Interacts with the LiveTraffic plugin. Acts as 'RealTraffic' data provider

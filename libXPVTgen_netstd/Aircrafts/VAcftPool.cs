@@ -177,23 +177,46 @@ namespace libXPVTgen.Aircrafts
           var vac = new IFRvAcft( route );
           m_pool.Add( vac );
           m_numIFR++;
-          Logger.Instance.Log( $"VAcftPool-AddIFR:     {vac.ID} - {vac.AcftFrom} - {vac.AcftTo}" );
+          Logger.Instance.Log( $"VAcftPool-Airway:     {vac.ID} - {vac.AcftFrom} - {vac.AcftTo}" );
         }
         else {
           // VFR - get a random VFR route script
           var route = GetRandomRouteScript( );
-          // get the preferred RWY if possible, else it is a random one in range
-          var rwy = GetRandomRwy( route.Descriptor.RunwayPreference, route.Descriptor.RunwayPrefStrict );
-          if ( rwy == null ) return; // no runways available ??
 
-          route.Descriptor.InitFromRunway( m_acftIndex++, rwy ); // Complete the script
-          // and create a flight
-          var vac = new VFRvAcft( route );
-          m_pool.Add( vac );
-          m_numVFR++;
-          Logger.Instance.Log( $"VAcftPool-AddVFR:     {vac.ID} - {vac.AcftFrom}" );
+          if ( route.Descriptor.FlightType == CmdA.FlightT.Runway ) {
+            // get the preferred RWY if possible, else it is a random one in range
+            var rwy = GetRandomRwy( route.Descriptor.RunwayPreference, route.Descriptor.RunwayPrefStrict );
+            if ( rwy == null ) return; // no runways available ??
+            // the simulated aircraft
+            route.Descriptor.InitFromRunway( m_acftIndex++, rwy ); // Complete the script
+            var vac = new VFRvAcft( route );
+            m_pool.Add( vac );
+            m_numVFR++;
+            Logger.Instance.Log( $"VAcftPool-Runway:     {vac.ID} - {vac.AcftFrom} - {vac.AcftTo}" );
+          }
+          else if ( route.Descriptor.FlightType == CmdA.FlightT.Airway ) {
+            return; // not supported - use the one above...
+          }
+          else if ( route.Descriptor.FlightType == CmdA.FlightT.MsgRelative ) {
+            // get the preferred RWY if possible, else it is a random one in range
+            var rwy = GetRandomRwy( "", false );
+            if ( rwy == null ) return; // no runways available ??
+            // the simulated aircraft
+            route.Descriptor.InitFromMsgRelative( m_acftIndex++, rwy, "SIM" ); // Complete the script
+            var vac = new VFRvAcft( route );
+            m_pool.Add( vac );
+            m_numVFR++;
+            Logger.Instance.Log( $"VAcftPool-MsgRel:     {vac.ID} - {vac.AcftFrom} - {vac.AcftTo}" );
+          }
+          else if ( route.Descriptor.FlightType == CmdA.FlightT.MsgAbsolute ) {
+            // the simulated aircraft
+            route.Descriptor.InitFromMsgAbsolute( m_acftIndex++, "SIM" ); // Complete the script
+            var vac = new VFRvAcft( route );
+            m_pool.Add( vac );
+            m_numVFR++;
+            Logger.Instance.Log( $"VAcftPool-MsgAbs:     {vac.ID} - {vac.AcftFrom} - {vac.AcftTo}" );
+          }
         }
-
       }
     }
 

@@ -42,6 +42,13 @@ namespace libXPVTgen.Aircrafts
 
 
     /// <summary>
+    /// cTor: Create an empty new aircraft
+    /// </summary>
+    public VAcft()
+    {
+    }
+
+    /// <summary>
     /// cTor: Create a new aircraft
     /// </summary>
     /// <param name="route">Segment list to fly</param>

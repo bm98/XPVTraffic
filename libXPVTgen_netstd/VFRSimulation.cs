@@ -47,7 +47,7 @@ namespace libXPVTgen
     /// <param name="dat_Path">The path to my_awy.dat</param>
     public VFRSimulation( string dat_Path, int stepLen_sec, bool logging )
     {
-      Logger.Instance.Reset();
+      Logger.Instance.Reset( );
       Logger.Instance.Logging = logging; // user
 
 #if DEBUG
@@ -180,21 +180,49 @@ namespace libXPVTgen
         return false;
       }
 
-      string rwID = route.Descriptor.RunwayPreference; // preferred one
-      if ( string.IsNullOrEmpty( rwID ) ) rwID = fallBackRwy;
-      var rwy = RWYDB.GetSubtable( rwID ); // search RWY
-      if ( rwy.Count < 1 ) {
-        Valid = false;
-        Error = $"Runway: {route.Descriptor.Start_IcaoID} not found in Runway database, cannot continue";
-        Logger.Instance.Log( Error );
-        return false;
+      if ( route.Descriptor.FlightType == CmdA.FlightT.Runway ) {
+        string rwID = route.Descriptor.RunwayPreference; // preferred one
+        if ( string.IsNullOrEmpty( rwID ) ) rwID = fallBackRwy;
+        var rwy = RWYDB.GetSubtable( rwID ); // search RWY
+        if ( rwy.Count < 1 ) {
+          Valid = false;
+          Error = $"Runway: {route.Descriptor.Start_IcaoID} not found in Runway database, cannot continue";
+          Logger.Instance.Log( Error );
+          return false;
+        }
+        // actually my position
+        m_userAcft = new UserAcft( );
+        m_userAcft.NewPos( rwy.ElementAt( 0 ).Value.start_latlon );
+        // the simulated aircraft
+        route.Descriptor.InitFromRunway( 1, rwy.ElementAt( 0 ).Value ); // Complete the script
       }
-      // actually my position
-      m_userAcft = new UserAcft( );
-      m_userAcft.NewPos( rwy.ElementAt( 0 ).Value.start_latlon );
+      else if ( route.Descriptor.FlightType == CmdA.FlightT.Airway ) {
+        return false; // not supported - use the one above...
+      }
+      else if ( route.Descriptor.FlightType == CmdA.FlightT.MsgRelative ) {
+        string rwID = route.Descriptor.RunwayPreference; // preferred one
+        if ( string.IsNullOrEmpty( rwID ) ) rwID = fallBackRwy;
+        var rwy = RWYDB.GetSubtable( rwID ); // search RWY
+        if ( rwy.Count < 1 ) {
+          Valid = false;
+          Error = $"Runway: {route.Descriptor.Start_IcaoID} not found in Runway database, cannot continue";
+          Logger.Instance.Log( Error );
+          return false;
+        }
+        // actually my position
+        m_userAcft = new UserAcft( );
+        m_userAcft.NewPos( rwy.ElementAt( 0 ).Value.start_latlon );
+        // the simulated aircraft
+        route.Descriptor.InitFromMsgRelative( 1, rwy.ElementAt( 0 ).Value, "SIM" ); // Complete the script
+      }
 
-      // the simulated aircraft
-      route.Descriptor.InitFromRunway( 1, rwy.ElementAt( 0 ).Value ); // Complete the script
+      else if ( route.Descriptor.FlightType == CmdA.FlightT.MsgAbsolute ) {
+        // actually my position
+        m_userAcft = new UserAcft( );
+        m_userAcft.NewPos( route.Descriptor.StartPos_latlon );
+        // the simulated aircraft
+        route.Descriptor.InitFromMsgAbsolute( 1, "SIM" ); // Complete the script
+      }
 
       var virtAcft = new VFRvAcft( route ); // use the GA model
       var kmlFile = new KmlFile( );

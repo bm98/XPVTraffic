@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 using System.Text;
@@ -66,6 +67,21 @@ namespace libXPVTgen.acftSim
         if ( ( this.Count > 0 ) && ( this.Peek( ) is CmdA ) ) return this.Peek( ) as CmdA;
         throw new NotSupportedException( "CmdList.Descriptor - CmdA element not found" ); // this is a program error..
       }
+    }
+
+    /// <summary>
+    /// Write the Route to the stream
+    /// </summary>
+    /// <param name="stream">The output stream</param>
+    public bool WriteRoute( StreamWriter stream )
+    {
+      if ( this.IsEmpty ) return false;
+      stream.WriteLine( $"# Start of script" );
+      foreach(var c in this ) { 
+        c.WriteToStream( stream );
+      }
+      stream.WriteLine( $"# End of script" );
+      return true;
     }
 
   }

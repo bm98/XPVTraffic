@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -71,6 +72,9 @@ namespace XPTsim
       txRwy.Text = AppSettings.Instance.FallbackRwy;
       numTotalAC.Value = AppSettings.Instance.NumAircrafts;
       numVFR.Value = AppSettings.Instance.NumVFRAircrafts;
+      cbxConvertFile.Checked = AppSettings.Instance.ConvertFile;
+      cbxAbsolutePos.Checked = AppSettings.Instance.AbsolutePos;
+      cbxIgnoreAirborne.Checked = AppSettings.Instance.IgnoreAirborne;
     }
 
     private void Form1_FormClosing( object sender, FormClosingEventArgs e )
@@ -85,63 +89,17 @@ namespace XPTsim
       AppSettings.Instance.FallbackRwy = txRwy.Text;
       AppSettings.Instance.NumAircrafts = numTotalAC.Value;
       AppSettings.Instance.NumVFRAircrafts = numVFR.Value;
+      AppSettings.Instance.ConvertFile = cbxConvertFile.Checked;
+      AppSettings.Instance.AbsolutePos = cbxAbsolutePos.Checked;
+      AppSettings.Instance.IgnoreAirborne = cbxIgnoreAirborne.Checked;
       AppSettings.Instance.Save( );
     }
 
 
-    private void btBasePath_Click( object sender, EventArgs e )
-    {
-      FLD.SelectedPath = txBasePath.Text;
-      if ( FLD.ShowDialog( this ) == DialogResult.OK ) {
-        txBasePath.Text = FLD.SelectedPath;
-      }
-    }
-
-
-    private void btSimVFR_Click( object sender, EventArgs e )
-    {
-      OFD.Title = "Load VFR Model File";
-      if ( OFD.ShowDialog( this ) == DialogResult.OK ) {
-        var sim = new VFRSimulation( m_dataLocation, 2, cbxLogging.Enabled );
-        if ( sim.Valid ) {
-          btSimVFR.BackColor = Color.ForestGreen;
-
-          if ( !sim.RunSimulation( OFD.FileName, txRwy.Text ) ) {
-            lblLink.Text = sim.Error;
-            btSimVFR.BackColor = Color.IndianRed;
-          }
-          else {
-            lblLink.Text = "KML File created in script folder";
-          }
-        }
-        else {
-          // error 
-          lblLink.Text = sim.Error;
-          btSimVFR.BackColor = Color.IndianRed;
-        }
-      }
-    }
-
-    private void btSimIFR_Click( object sender, EventArgs e )
-    {
-      var sim = new VFRSimulation( m_dataLocation, 2, cbxLogging.Enabled );
-      if ( !sim.RunIFRSim() ) {
-        lblLink.Text = sim.Error;
-        btSimVFR.BackColor = Color.IndianRed;
-      }
-      else {
-        lblLink.Text = "KML File created in appDir";
-      }
-    }
-
-    private void btDumpIFR_Click( object sender, EventArgs e )
-    {
-      var sim = new VFRSimulation( m_dataLocation, 2, cbxLogging.Enabled );
-      sim.DumpIFR( );      
-    }
 
     private void btCreateLink_Click( object sender, EventArgs e )
     {
+      lblLink.Text = "...";
       btCreateLink.Enabled = false;
       TH = new TrafficHandler( m_dataLocation, m_stepLength_Sec, cbxLogging.Enabled );
 
@@ -186,8 +144,97 @@ namespace XPTsim
       btCreateLink.Enabled = true;
     }
 
+    private void btSimVFR_Click( object sender, EventArgs e )
+    {
+      lblLink.Text = "...";
+      btSimVFR.BackColor = btDropLink.BackColor; // this is the native button color...
+
+      OFD.Filter = "Script Files|*.vsc|All Files|*.*";
+      OFD.Title = "Load VFR Model File";
+      if ( OFD.ShowDialog( this ) == DialogResult.OK ) {
+        lblLink.Text = $"Simulation of: {OFD.FileName}\n";
+        var sim = new VFRSimulation( m_dataLocation, 2, cbxLogging.Enabled );
+        if ( sim.Valid ) {
+          btSimVFR.BackColor = Color.ForestGreen;
+
+          if ( !sim.RunSimulation( OFD.FileName, txRwy.Text ) ) {
+            lblLink.Text += sim.Error;
+            btSimVFR.BackColor = Color.IndianRed;
+          }
+          else {
+            lblLink.Text += "KML File created in script folder";
+          }
+        }
+        else {
+          // error 
+          lblLink.Text += sim.Error;
+          btSimVFR.BackColor = Color.IndianRed;
+        }
+        lblLink.Text += $"DONE";
+      }
+    }
+
+    private void btSimIFR_Click( object sender, EventArgs e )
+    {
+      lblLink.Text = "...";
+
+      var sim = new VFRSimulation( m_dataLocation, 2, cbxLogging.Enabled );
+      if ( !sim.RunIFRSim( ) ) {
+        lblLink.Text = sim.Error;
+        btSimVFR.BackColor = Color.IndianRed;
+      }
+      else {
+        lblLink.Text = "KML File created in appDir";
+      }
+    }
+
+    private void btDumpIFR_Click( object sender, EventArgs e )
+    {
+      lblLink.Text = "...";
+
+      var sim = new VFRSimulation( m_dataLocation, 2, cbxLogging.Enabled );
+      sim.DumpIFR( );
+    }
+
+    private void btConvertAIT_Click( object sender, EventArgs e )
+    {
+      lblLink.Text = "";
+      lblConvert.Text = "";
+      btConvertAIT.BackColor = btDropLink.BackColor; // this is the native button color...
+
+      int numFiles = 0;
+      OFD.Title = "Convert AITraffic Files";
+      OFD.Multiselect = false;
+      OFD.Filter = "AIT Files|*.csv";
+
+      var fList = new List<string>( );
+      if ( OFD.ShowDialog( this ) == DialogResult.OK ) {
+        if ( cbxConvertFile.Checked ) {
+          lblLink.Text = $"Converting {OFD.FileName}\n";
+          fList.Add( OFD.FileName );
+          numFiles = 1;
+        }
+        else {
+          lblLink.Text = $"Converting Folder {Path.GetDirectoryName( OFD.FileName )}\n";
+          fList = Directory.EnumerateFiles( Path.GetDirectoryName( OFD.FileName ), "*.csv", SearchOption.AllDirectories ).ToList( );
+          numFiles = fList.Count( );
+        }
+        int fconv = 0;
+        foreach ( var file in fList ) {
+          var AIC = new AITConverter( );
+          if ( !AIC.CreateRouteScript( file, cbxAbsolutePos.Checked, cbxIgnoreAirborne.Checked ) ) {
+            lblLink.Text += $"Conv error: {file}\n\t{AIC.Error}\n";
+          }
+          lblConvert.Text = $"{++fconv} of {numFiles} converted";
+        }
+        lblLink.Text += $"DONE";
+      }
+    }
+
     private void btCreateDB_Click( object sender, EventArgs e )
     {
+      lblCreate.Text = "...";
+
       btCreateDB.Enabled = false;
       if ( MessageBox.Show( $"We are about to create new database files\nThis may take a while!\nShall we continue?", "Create Database Files", MessageBoxButtons.YesNo ) == DialogResult.Yes ) {
         XP11.BasePath = txBasePath.Text; // MUST be set before using DBCreator
@@ -207,6 +254,15 @@ namespace XPTsim
       btCreateDB.Enabled = true;
     }
 
+    private void btBasePath_Click( object sender, EventArgs e )
+    {
+      FLD.SelectedPath = txBasePath.Text;
+      if ( FLD.ShowDialog( this ) == DialogResult.OK ) {
+        txBasePath.Text = FLD.SelectedPath;
+      }
+    }
+
+
     private bool m_pingTog = true;
     private void timer1_Tick( object sender, EventArgs e )
     {
@@ -214,5 +270,9 @@ namespace XPTsim
       lblPing.Text += $" of {m_stepLength_Sec} sec";
     }
 
+    private void txRwy_TextChanged( object sender, EventArgs e )
+    {
+
+    }
   }
 }

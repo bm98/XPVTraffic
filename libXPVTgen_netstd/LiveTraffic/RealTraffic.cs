@@ -137,6 +137,53 @@ namespace libXPVTgen.LiveTraffic
       return rt;
     }
 
+    /// <summary>
+    /// Convert an AI Traffic string to a AITvAcft moment
+    /// </summary>
+    /// <param name="aString">One AI Traffic message as string</param>
+    /// <returns>A AITvAcft Moment of that string or null if invalid</returns>
+    public static AITvAcft FromAITrafficString( string aString )
+    {
+      if ( !aString.StartsWith( "AITFC," ) ) return null;
+      string[] e = aString.Split( new char[] { ',' } );
+      if ( e.Length < 15 ) return null;
+
+      var vac = new AITvAcft( );
+      var ret = true;
+      vac.AcftHex = e[1];
+      ret &= double.TryParse( e[2], out double lat );
+      ret &= double.TryParse( e[3], out double lon );
+      ret &= double.TryParse( e[4], out double alt );
+      ret &= double.TryParse( e[5], out double vsi );
+      ret &= int.TryParse( e[6], out int airborne );
+      ret &= double.TryParse( e[7], out double track );
+      ret &= double.TryParse( e[8], out double gs );
+      vac.AcftCallsign = e[9];
+      vac.AcftType = e[10];
+      vac.AcftTailReg = e[11];
+      vac.AcftFrom = e[12];
+      vac.AcftTo = e[13];
+      ret &= long.TryParse( e[14], out long ts );
+
+      if ( !ret ) return null; // ERROR one of the Parses failed
+
+      // complete the Acft data
+      vac.LatLon = new LatLon( lat, lon );
+      vac.Alt_ft = (int)alt;
+      vac.VSI = vsi;
+      vac.Airborne = ( airborne != 0 );
+      vac.TRK = track;
+      vac.GS = gs;
+      vac.TStamp = ts;
+
+      // sanity checks - we need some items
+      if ( vac.TStamp <= 0 ) return null;
+      if ( vac.Alt_ft <= 0 ) return null;
+
+      // TODO lookup acftType from hexcode in a database      
+      return vac;
+    }
+
 
     /*
      The weather messages are broadcast as UDP packets once every 10 seconds on port 49004
@@ -157,7 +204,6 @@ namespace libXPVTgen.LiveTraffic
       // METAR remains empty and the APT is Zurich... may be a long way from some...
       return $"{{\"ICAO\": \"LSZH\",\"QNH\": 1013, \"METAR\": \"\", \"NAME\": \"ZURICH\", \"IATA\": \"ZRH\" , \"DISTNM\": 10}}";
     }
-
 
   }
 }

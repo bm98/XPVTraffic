@@ -2,7 +2,7 @@
 # VFR Route Script
 # 20200712/BM
 #
-A=C182;LSZH_RW14  # a new C182, start from LSZH_RW14 (if it is found in range)
+A=C182;Runway;LSZH_RW14  # a new C182, start from LSZH_RW14 (if it is found in range)
 S=90        # init TAS
 V=10;100  # climb to 1000 ft AGL @ 500ft/Min
 D=0.2

@@ -2,7 +2,7 @@
 # VFR Route Script
 # 20200704/BM
 #
-A=BE20      # a new BE20
+A=BE20;Runway      # a new BE20
 S=95        # init TAS at 95 kts
 V=10;100    # Slow climb to show takeoff
 D=0.2

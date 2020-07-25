@@ -11,6 +11,20 @@ namespace libXPVTgen.Aircrafts
   {
     private static Random m_random = new Random( (int)DateTime.Now.Ticks ); // creates a new sequence
 
+    // Selection of GA Aircraft types avilable from the Bluebird CSL library (may be extend for heuristic GAs in LiveTraffic)
+    public static List<string> GA_AircraftTypes = new List<string>( ) { "C150", "C172", "C421", "BE20", "PC9" };
+    /// <summary>
+    /// Get a random GA aircraft type from the Bluebird CSL selection
+    /// </summary>
+    /// <returns>An Aircraft Type and Flight</returns>
+    public static AcftTypeOp GetRandomGAAcftTypeOp()
+    {
+      int idx = m_random.Next( GA_AircraftTypes.Count );
+      var ret = new AcftTypeOp( ) { AcftType = GA_AircraftTypes[idx], AcftOperator = "YYY" };
+      return ret;
+    }
+
+
     /// <summary>
     /// A supported Aircraft Type and Airline
     /// </summary>
@@ -448,8 +462,6 @@ namespace libXPVTgen.Aircrafts
       new string[] {"SF34", "UAL"},
       new string[] {"SF34", "USA"},
       new string[] {"SF34", "WST"},
-      new string[] {""},
-      new string[] {"Airliners"},
       new string[] {"A319", "GAF"},
       new string[] {"A320", "GHY"},
       new string[] {"MD83", "GWI"},

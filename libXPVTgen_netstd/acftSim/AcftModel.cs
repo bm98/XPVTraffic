@@ -60,65 +60,27 @@ namespace libXPVTgen.acftSim
     /// <summary>
     /// Current Pos [lat,lon]
     /// </summary>
-    public LatLon Pos
-    {
-      get => m_pos;
-      private set { lock ( m_lock ) { m_pos = new LatLon( value ); } }
-    }
+    public LatLon Pos { get => m_pos; }
 
     /// <summary>
     /// Current Altitude [ft MSL]
     /// </summary>
-    public double Alt_ftMsl
-    {
-      get => m_alt_ftMsl;
-    }
+    public double Alt_ftMsl { get => m_alt_ftMsl; }
 
     /// <summary>
     /// Current Track [degm]
     /// </summary>
-    public double Trk_degm
-    {
-      get => m_trk_degm;
-      private set { lock ( m_lock ) { m_trk_degm = value; } }
-    }
+    public double Trk_degm { get => m_trk_degm; }
 
     /// <summary>
     /// Current Groundspeed [kt]
     /// </summary>
-    public double GS_kt
-    {
-      get => m_gs_kt;
-      private set { lock ( m_lock ) { m_gs_kt = value; } }
-    }
+    public double GS_kt { get => m_gs_kt; }
 
     /// <summary>
     /// Current Vertical Rate VSI [ft/Min]
     /// </summary>
-    public double VRate_ftPmin
-    {
-      get => m_vRate_ftPmin;
-      private set { lock ( m_lock ) { m_vRate_ftPmin = value; } }
-    }
-
-    /// <summary>
-    /// Current LegLength to travel straight
-    /// </summary>
-    public double Leg_nm
-    {
-      get => m_leg_nm;
-      private set { lock ( m_lock ) { m_leg_nm = value; } }
-    }
-
-    /// <summary>
-    /// True if a turn/heading change has finished
-    /// </summary>
-    public bool TurnFinished { get => m_turn_deg == 0; } // double specs that 0.0 exists..
-
-    /// <summary>
-    /// True if a leg is finished
-    /// </summary>
-    public bool LegFinished { get => m_leg_nm <= 0; }
+    public double VRate_ftPmin { get => m_vRate_ftPmin; }
 
     /// <summary>
     /// True if we are above ground
@@ -136,6 +98,25 @@ namespace libXPVTgen.acftSim
     public bool Out { get => ( m_currentSeg is CmdE ) && TurnFinished && LegFinished; }
 
     /// <summary>
+    /// Current LegLength to travel straight
+    /// </summary>
+    private double Leg_nm
+    {
+      get => m_leg_nm;
+      set { lock ( m_lock ) { m_leg_nm = value; } }
+    }
+
+    /// <summary>
+    /// True if a turn/heading change has finished
+    /// </summary>
+    private bool TurnFinished { get => m_turn_deg == 0; } // double specs that 0.0 exists..
+
+    /// <summary>
+    /// True if a leg is finished
+    /// </summary>
+    private bool LegFinished { get => m_leg_nm <= 0; }
+
+    /// <summary>
     /// cTor: Init a new flight model
     /// </summary>
     /// <param name="route">Segment list to fly</param>
@@ -145,7 +126,7 @@ namespace libXPVTgen.acftSim
 
       m_pos = new LatLon( route.Descriptor.StartPos_latlon );
 
-      m_altBaseMsl = false; // relative altitudes at init
+      m_altBaseMsl = ( route.Descriptor.FlightType == CmdA.FlightT.Runway ) ? false : true; // relative altitudes at init for Runway scripts
       m_alt_ftMslInit = route.Descriptor.StartAlt_ftMsl; // save initial altMSL for later reference
       m_altRwy_ftMsl = route.Descriptor.RwyAlt_ftMsl;
 
@@ -158,16 +139,16 @@ namespace libXPVTgen.acftSim
       m_turn_deg = 0;
       m_tRate_degPsec = 0;
 
-      m_gs_kt = 0;
+      m_gs_kt = route.Descriptor.StartGS_kn;
       m_setGS_kt = m_gs_kt;
       m_accel_ktPsec = 0;
       m_leg_nm = 0;
 
       m_route = route.DeepCopy( ); // make a local copy to manipulate
-      NextSeg( ); // load first segment
-
       m_tick = DateTime.Now;
       Logger.Instance.Log( $"AcftModel-Init-{m_acftID} Pos: {m_pos.ToString( )}; AltMSL: {m_alt_ftMslInit}; Trk: {m_trk_degm}" );
+
+      NextSeg( ); // load first segment
     }
 
     /// <summary>
@@ -177,7 +158,7 @@ namespace libXPVTgen.acftSim
     /// </summary>
     /// <param name="vs">vert speed [ft/min] +-model max </param>
     /// <param name="alt">target alt [ft] 0 .. alt .. model max </param>
-    public void SetAlt( double vs, double alt )
+    private void SetAlt( double vs, double alt )
     {
       var newAltMsl = ( m_altBaseMsl ) ? alt : m_alt_ftMslInit + alt; // set new target alt according to alt mode
 
@@ -199,11 +180,12 @@ namespace libXPVTgen.acftSim
     /// </summary>
     /// <param name="gs">target spd [kt] >0 .. max </param>
     /// <param name="accel">accel [kt/sec] >0 .. max </param>
-    public void SetSpeed( double gs, double accel )
+    /// <param name="immediate">Set speed immediate [bool] </param>
+    private void SetSpeed( double gs, double accel, bool immediate )
     {
       // some sanity checks - set defaults if input is out of bounds
       if ( gs > c_maxGS_kt ) gs = c_maxGS_kt;
-      if ( gs <= 0 ) gs = 100;
+      if ( gs <= 0 ) gs = 10;
       if ( accel > c_maxAccel_knPsec ) accel = c_maxAccel_knPsec;
       if ( accel < c_minAccel_knPsec ) accel = c_minAccel_knPsec;
 
@@ -211,6 +193,7 @@ namespace libXPVTgen.acftSim
         m_setGS_kt = gs;
         if ( m_setGS_kt > m_gs_kt ) m_accel_ktPsec = accel; // must speedup
         if ( m_setGS_kt < m_gs_kt ) m_accel_ktPsec = -accel; // must speeddown
+        if ( immediate ) m_gs_kt = gs; // immediate (used to intro IFR model at speed)
       }
     }
 
@@ -219,7 +202,7 @@ namespace libXPVTgen.acftSim
     /// </summary>
     /// <param name="angle">turn angle [°] -360 .. angle .. 360 </param>
     /// <param name="turnRate">turnrate [deg/sec] 0.5..9.0 </param>
-    public void SetTurn( double angle, double turnRate )
+    private void SetTurn( double angle, double turnRate )
     {
       // some sanity checks - set defaults if input is out of bounds
       if ( angle > 360.0 ) angle = angle.AddDegrees( 0 );
@@ -239,7 +222,7 @@ namespace libXPVTgen.acftSim
     /// </summary>
     /// <param name="brg">target brg [degm] 0..360</param>
     /// <param name="turnRate">turnrat [deg/sec] 0.5..9.0 </param>
-    public void SetTrack( double brg, double turnRate )
+    private void SetTrack( double brg, double turnRate )
     {
       // some sanity checks - set defaults if input is out of bounds
       if ( brg < 0 ) brg = 0;
@@ -268,7 +251,7 @@ namespace libXPVTgen.acftSim
     /// </summary>
     /// <param name="dest">target [lat/lon]</param>
     /// <param name="turnRate">turnrat [deg/sec] 0.5..9.0 </param>
-    public void SetDestination( LatLon dest, double turnRate )
+    private void SetDestination( LatLon dest, double turnRate )
     {
       // some sanity checks - set defaults if input is out of bounds
       if ( turnRate > c_maxTRate_degPsec ) turnRate = c_maxTRate_degPsec;
@@ -282,6 +265,34 @@ namespace libXPVTgen.acftSim
       Leg_nm = dist;
     }
 
+    /// <summary>
+    /// Correct the leg for a turn radius
+    /// </summary>
+    /// <returns>A +- nm correction for the leg</returns>
+    private void ApplyLegCorrection()
+    {
+      if ( m_route.Count > 0 && m_route.Peek( ) is CmdG ) {
+        // we may need to turn before the next segment and hence shorten the leg accordingly
+        var g = m_route.Peek( ) as CmdG;
+        var midPos = m_pos.DestinationPoint( m_leg_nm, m_trk_degm ); // that would be our intermediate dest
+        var endBrg = midPos.BearingTo( g.Destination ); // track to go for
+        // set a turn towards the smaller angle
+        double turn = endBrg.SubDegrees( m_trk_degm ); // -> positive angle
+        // take the shorter one (<=180.0)
+        if ( turn > 180.0 ) turn = turn - 360.0;
+        double cutLen = 0; // this would be our cut of the leg
+        // don't bother with small angles
+        if ( Math.Abs( turn ) > 3 ) {
+          var turnTime = Math.Abs( turn ) / g.TurnRate;
+          cutLen = turnTime * ( m_gs_kt / 3600.0 ); // turn nm before end to make the turn
+          Logger.Instance.Log( $"AcftModel-{m_acftID} SegG peeked, next turn is {turn:##0}° - cutting {cutLen} nm from current leg {m_leg_nm}" );
+        }
+        else {
+          Logger.Instance.Log( $"AcftModel-{m_acftID} SegG peeked, next turn is {turn:##0}° - not cutting from current leg {m_leg_nm}" );
+        }
+        m_leg_nm -= cutLen;
+      }
+    }
 
     // Set the next segment active
     // Note: dont use this in a locked block as it locks to update items !!!!
@@ -292,46 +303,61 @@ namespace libXPVTgen.acftSim
 
       switch ( m_currentSeg.Cmd ) {
         case Cmd.A:
-          ; // debug stop only
+          ; // debug stop only, all CmdA handling was done in cTor
           Logger.Instance.Log( $"AcftModel-{m_acftID} SegA" );
           NextSeg( );
           break;
         case Cmd.D:
           Leg_nm = ( m_currentSeg as CmdD ).Dist;
           Logger.Instance.Log( $"AcftModel-{m_acftID} SegD" );
+          ApplyLegCorrection( );
           break;
         case Cmd.T:
           SetTurn( ( m_currentSeg as CmdT ).TurnAngle, ( m_currentSeg as CmdT ).TurnRate );
           Logger.Instance.Log( $"AcftModel-{m_acftID} SegT" );
+          ApplyLegCorrection( );
           break;
         case Cmd.H:
           SetTrack( ( m_currentSeg as CmdH ).Bearing, ( m_currentSeg as CmdH ).TurnRate );
           Logger.Instance.Log( $"AcftModel-{m_acftID} SegH" );
+          ApplyLegCorrection( );
           break;
         case Cmd.G:
           SetDestination( ( m_currentSeg as CmdG ).Destination, ( m_currentSeg as CmdG ).TurnRate );
           Logger.Instance.Log( $"AcftModel-{m_acftID} SegG" );
+          ApplyLegCorrection( );
           break;
 
         case Cmd.S:
-          SetSpeed( ( m_currentSeg as CmdS ).GS, ( m_currentSeg as CmdS ).Accel );
+          SetSpeed( ( m_currentSeg as CmdS ).GS, ( m_currentSeg as CmdS ).Accel, ( m_currentSeg as CmdS ).Immediate );
           Logger.Instance.Log( $"AcftModel-{m_acftID} SegS" );
+          ApplyLegCorrection( );
           NextSeg( ); // immediate command - just trigger the next one
           break;
         case Cmd.V:
           SetAlt( ( m_currentSeg as CmdV ).VSI, ( m_currentSeg as CmdV ).AltAGL );
           Logger.Instance.Log( $"AcftModel-{m_acftID} SegV" );
+          ApplyLegCorrection( );
           NextSeg( ); // immediate command - just trigger the next one
           break;
 
         case Cmd.M:
           m_altBaseMsl = ( m_currentSeg as CmdM ).MslBased;
+          double alt = ( m_currentSeg as CmdM ).AltMsl;
+          if ( m_altBaseMsl && alt > 0 ) {
+            // set absolute altitude for the next step
+            m_setAlt_ftMsl = alt;
+            m_alt_ftMsl = alt;
+            m_vRate_ftPmin = 0; // and no change anymore
+          }
           Logger.Instance.Log( $"AcftModel-{m_acftID} SegM" );
+          ApplyLegCorrection( );
           NextSeg( ); // immediate command - just trigger the next one
           break;
         default:
           break;
       }
+
     }
 
 
@@ -396,6 +422,9 @@ namespace libXPVTgen.acftSim
       else if ( m_currentSeg is CmdG && LegFinished ) NextSeg( );
       else if ( m_currentSeg is CmdH && TurnFinished ) NextSeg( );
       else if ( m_currentSeg is CmdT && TurnFinished ) NextSeg( );
+      // we don't move if GS is zero i.e. wait endlessly for the next segment
+      else if ( m_gs_kt <= 0 ) NextSeg( );
+
     }
 
   }

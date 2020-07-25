@@ -99,6 +99,30 @@ namespace XPTsim
       set { this["NumVFRAircrafts"] = value; }
     }
 
+    [UserScopedSetting( )]
+    [DefaultSettingValue( "True" )]
+    public bool ConvertFile
+    {
+      get { return (bool)this["ConvertFile"]; }
+      set { this["ConvertFile"] = value; }
+    }
+
+    [UserScopedSetting( )]
+    [DefaultSettingValue( "False" )]
+    public bool AbsolutePos
+    {
+      get { return (bool)this["AbsolutePos"]; }
+      set { this["AbsolutePos"] = value; }
+    }
+
+    [UserScopedSetting( )]
+    [DefaultSettingValue( "False" )]
+    public bool IgnoreAirborne
+    {
+      get { return (bool)this["IgnoreAirborne"]; }
+      set { this["IgnoreAirborne"] = value; }
+    }
+
     #endregion
 
 

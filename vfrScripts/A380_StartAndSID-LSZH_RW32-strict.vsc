@@ -3,7 +3,7 @@
 # A380 takeoff SID DEGES 3L from RWY 32 (Strict, cannot use a random rwy)
 # 20200718/BM
 #
-A=A388;LSZH_RW32;S  # a new A380
+A=A388;Runway;LSZH_RW32;S  # a new A380
 M=1          # use MSL altitudes from now on
 S=160;3      # accel to rotate...
 D=1.2        # 1.2 nm on the runway.. should get us to about 160kt
