@@ -16,6 +16,13 @@ namespace libXPVTgen.Aircrafts
   {
     private static Random m_random = new Random( (int)DateTime.Now.Ticks );
 
+    // maintain IFR flights within certain levels
+    private const int c_maxLevel = 45_000; // ft AMSL
+    private const int c_minLevel = 3_000;  // ft AMSL
+
+    private static int MaxLevel( int alt ) { return ( alt > c_maxLevel ) ? c_maxLevel : alt; }
+    private static int MinLevel( int alt ) { return ( alt < c_minLevel ) ? c_minLevel : alt; }
+
     // Get one airway as random selection or null 
     private static awyRec GetRandomAwy( awyTable awyTableRef )
     {
@@ -30,25 +37,25 @@ namespace libXPVTgen.Aircrafts
     {
       double gs = 180;
       if ( layer == 1 ) { // low
-        gs = m_random.Next( 160, 210 ); // some variations is tas..
+        gs = m_random.Next( 160, 210 ); // some variations is gs for low enroutes
       }
       else if ( layer == 2 ) { // high
-        gs = m_random.Next( 250, 420 ); // some variations is tas..
+        gs = m_random.Next( 250, 420 ); // some variations is gs for high enroutes
       }
       return gs;
     }
 
-    // Get a new altitude from the given altitude within min and max FL
+    // Get a new altitude from the given altitude within min and max airway level
     private static int GetNewAlt( int alt, int lvlMin, int lvlMax )
     {
       // Sanity checks for level limits
-      if ( lvlMax > 50_000 ) lvlMax = 50_000; // Hard limit
-      if ( lvlMin < 3_000 ) lvlMin = 3_000; // Hard limit
-      if ( alt < lvlMin ) return lvlMin+100; // we are too low
-      if ( alt > lvlMax ) return lvlMax-100; // we are too high
+      lvlMax = MaxLevel( lvlMax );
+      lvlMin = MinLevel( lvlMin );
+      if ( alt < lvlMin ) return lvlMin + 100; // we are too low
+      if ( alt > lvlMax ) return lvlMax - 100; // we are too high
 
       // now we are within the levels
-      int lc = m_random.Next( -5, 5 ); // between +- 500ft
+      int lc = m_random.Next( -5, 5 ); // select between +- 500ft
       int newAlt = alt + lc * 100;
       if ( ( newAlt < lvlMin ) || ( newAlt > lvlMax ) ) {
         newAlt = alt - lc * 100; // use the other direction if we are out of limits
@@ -75,7 +82,7 @@ namespace libXPVTgen.Aircrafts
       // add Aircraft Descriptor first
       route.Enqueue( new CmdA( acftType, CmdA.FlightT.Airway, airline ) );
       // some random altitude and complete start of the route
-      var altMsl = m_random.Next( awy.baseFt, awy.topFt );
+      var altMsl = m_random.Next( MinLevel( awy.baseFt ), MaxLevel( awy.topFt ) );
       altMsl = (int)Math.Round( altMsl / 100.0 ) * 100; // get 100 ft increments
       route.Descriptor.InitFromAirway( acftNo, awy, altMsl, GetSpeed( awy.layer ) );   // set start conditions (assumes MslBase=0)
       // add segment length command
@@ -85,25 +92,25 @@ namespace libXPVTgen.Aircrafts
       // do we have an airway to go from here?
       var newleg = awyTableRef.GetNextSegment( awy );
       while ( newleg != null ) {
-        if (visited.Contains( newleg.startID ) ) {
+        if ( visited.Contains( newleg.startID ) ) {
           break; // this would create a circle (endless loop)
         }
 
         awy = newleg;
         // random speed change
-        if ( m_random.Next( 10 ) == 0 ) {
+        if ( m_random.Next( 10 ) == 0 ) { // one out of 10 
           // add S command
           route.Enqueue( new CmdS( GetSpeed( awy.layer ) ) );
         }
         // random alt change
-        if ( m_random.Next( 20 ) == 0 ) {
+        if ( m_random.Next( 20 ) == 0 ) { // one out of 20 
           // add V command
           altMsl = GetNewAlt( altMsl, awy.baseFt, awy.topFt );
-          route.Enqueue( new CmdV( 1200, altMsl ) );  // assumes MslBase = 0; hence all is AGL
+          route.Enqueue( new CmdV( 1200, altMsl ) );
         }
-        // ass Goto command
+        // add Goto command
         route.Enqueue( new CmdG( awy.end_latlon ) );
-        visited.Add( awy.startID ); // we add all startIDs
+        visited.Add( awy.startID ); // we add all startIDs to avoid loops above
 
         // try next one
         newleg = awyTableRef.GetNextSegment( awy );

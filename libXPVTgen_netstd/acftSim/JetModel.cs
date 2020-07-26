@@ -21,7 +21,7 @@ namespace libXPVTgen.acftSim
       // set Jet max and consts
       c_maxGS_kt = 500;         // on the high side for this purpose
       c_maxVRate_ftPmin = 2500; // +-
-      c_maxAlt_ftMSL = 50_000;
+      c_maxAlt_ftMSL = 45_000;
       c_accel_ktPsec = 5.0;     // default acceleration kt/s
       c_tRate_degPsec = 3.0;    // turnrate deg/sec
     }

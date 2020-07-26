@@ -176,7 +176,7 @@
       this.numTotalAC.Size = new System.Drawing.Size(63, 22);
       this.numTotalAC.TabIndex = 7;
       this.numTotalAC.Value = new decimal(new int[] {
-            100,
+            50,
             0,
             0,
             0});
@@ -206,7 +206,7 @@
       this.numVFR.Size = new System.Drawing.Size(63, 22);
       this.numVFR.TabIndex = 9;
       this.numVFR.Value = new decimal(new int[] {
-            20,
+            25,
             0,
             0,
             0});
@@ -255,7 +255,7 @@
       this.txRwy.Name = "txRwy";
       this.txRwy.Size = new System.Drawing.Size(87, 22);
       this.txRwy.TabIndex = 14;
-      this.txRwy.Text = "NZWN_RW16";
+      this.txRwy.Text = "LSZH_RW28";
       this.txRwy.TextChanged += new System.EventHandler(this.txRwy_TextChanged);
       // 
       // label5

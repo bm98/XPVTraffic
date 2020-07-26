@@ -29,6 +29,7 @@ V 0.9Build9
 - add a number of recorded ADS-B flights converted to relative scripts
 - update Refacture Scripting classes and modes for AIT conversions
 - update GUI and settings for conversion of AIT files
+- update Max Flightlevel to 45000 ft for IFR traffic
 - fix Sim Model issues with GS=0
 - fix Wrong entries in Aircraft Selections
 

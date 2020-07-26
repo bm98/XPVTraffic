@@ -100,7 +100,7 @@ To switch back to relative, above runway, elevation based altitudes use
 
 ---
 
-### Limits and Defaults
+### Scripting Limits and Defaults
 
 For all models:
 * Min accel = 0.5 kt/sec
@@ -111,14 +111,14 @@ For all models:
 For GA aircrafts the following limits and defaults apply:  
 * Max GS = 180 kt
 * Max Vertical Rate = 1500 ft/min
-* Max Altitude = 10'000 ft above the starting runway
+* Max Altitude = 10'000 ft AMSL
 * Default acceleration = 2 kt/sec
 * Default turnrate = 3 deg/sec
 
 For all other aircrafts the following limits and defaults apply:  
 * Max GS = 500 kt
 * Max Vertical Rate = 2500 ft/min
-* Max Altitude = 50'000 ft above the starting runway
+* Max Altitude = 45'000 ft AMSL
 * Default acceleration = 5 kt/sec
 * Default turnrate = 3 deg/sec
 
@@ -138,12 +138,13 @@ If all is well a `scriptname.vsc.kml` file is created in the same folder as the 
 Specification see https://rtweb.flyrealtraffic.com/RTdev1.4.pdf
 
 There is a conversion for captured AIT files to scripts in order to create virtual traffic from such records.  
-Note: There is little checking for such files built in and some may create AIT conversion errors.   
+Note: There is little checking for such files built in and some may create AIT conversion errors.     
 AIT record files **must have the extension '.csv'** else they are not recognised by the converter.  
-AIT message records must start with the AITFC= tag and have all 14 arguments included.  
-Lat/Lon/Alt/Timestamp is mandatory, GS is recommended to create a somehow proper flight profile.    
-The conversion will try to estimate GS if not available but those guesses are not considering turns i.e. speed is ususally too slow.  
-By default only records with the Airborne flag =1 are recorded but you may ignore this flag in the GUI but then the conversion may fail.    
+AIT message records must start with the 'AITFC=' tag and have all 14 arguments included.  
+**Numbers must exists** but can be 0, strings e.g. from, to, cs, tail may be left empty.  
+**Lat/Lon/Alt/Timestamp are mandatory**, GS is recommended to create a somehow proper flight profile. Very slow GS are to be avoided.       
+The conversion will try to estimate GS is zero but those guesses are not considering turns i.e. speed is ususally too slow.  
+By default only records with the Airborne flag =1 are recorded but you may ignore this flag in the GUI but again then the conversion may fail.    
 A conversion can be absolute or relative (checkbox).  
 * Default is relative i.e. the virtual traffic created from such a script starts from a random location in range it is composed from turns and straight segments at the recorded Altitude (MSL).  
 * Absolute conversion will locate and fly the recorded coordinates if the starting point is in range else the script is ignored.    

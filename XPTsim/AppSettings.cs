@@ -84,7 +84,7 @@ namespace XPTsim
     }
 
     [UserScopedSetting( )]
-    [DefaultSettingValue( "100" )]
+    [DefaultSettingValue( "50" )]
     public decimal NumAircrafts
     {
       get { return (decimal)this["NumAircrafts"]; }
@@ -92,7 +92,7 @@ namespace XPTsim
     }
 
     [UserScopedSetting( )]
-    [DefaultSettingValue( "20" )]
+    [DefaultSettingValue( "25" )]
     public decimal NumVFRAircrafts
     {
       get { return (decimal)this["NumVFRAircrafts"]; }

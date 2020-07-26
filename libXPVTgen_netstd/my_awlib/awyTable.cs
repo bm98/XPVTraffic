@@ -187,11 +187,10 @@ namespace libXPVTgen.my_awlib
             Logger.Instance.Log( $"awyTable: Routing: ContSeg: {leg.Value.ident}" );
             return leg.Value;
           }
-          // not a continuation, change airway then but only at some angle
-          float diversion = seg.brg - leg.Value.brg;
-          if ( diversion < 0 ) diversion += 360.0f;
+          // not a continuation, chance to change the airway then but only at some angle
+          float diversion = Math.Abs(seg.brg - leg.Value.brg);
           if ( diversion < 150.0f ) {
-            // this is a some decent continuation (max brg diff is 150°)
+            // this is a decent continuation (max brg diff is 150°)
             leglist.Add( leg.Value );
           }
         }
