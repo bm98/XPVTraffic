@@ -1,5 +1,5 @@
-XPVTraffic V 0.9 - Build 9 BETA
-(c) M.Burri - 25-Jul-2020
+XPVTraffic V 0.10 - Build 10 BETA
+(c) M.Burri - 02-Apr-2021
 
 Files & folders:
 
@@ -24,6 +24,8 @@ Scanned for viruses before packing...
 bm98@burri-web.org
 
 Changelog:
+V 0.10Build10
+- fix force application locale decimal sign to dot for number formatting
 V 0.9Build9
 - add conversion of AITraffic files to scripts
 - add a number of recorded ADS-B flights converted to relative scripts
