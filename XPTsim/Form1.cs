@@ -203,9 +203,9 @@ namespace XPTsim
       btConvertAIT.BackColor = btDropLink.BackColor; // this is the native button color...
 
       int numFiles = 0;
-      OFD.Title = "Convert AITraffic Files";
+      OFD.Title = "Convert RTTraffic Files";
       OFD.Multiselect = false;
-      OFD.Filter = "AIT Files|*.csv";
+      OFD.Filter = "RTT Files|*.csv";
 
       var fList = new List<string>( );
       if ( OFD.ShowDialog( this ) == DialogResult.OK ) {
@@ -221,7 +221,7 @@ namespace XPTsim
         }
         int fconv = 0;
         foreach ( var file in fList ) {
-          var AIC = new AITConverter( );
+          var AIC = new RTTConverter( );
           if ( !AIC.CreateRouteScript( file, cbxAbsolutePos.Checked, cbxIgnoreAirborne.Checked ) ) {
             lblLink.Text += $"Conv error: {file}\n\t{AIC.Error}\n";
           }

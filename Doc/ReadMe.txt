@@ -1,5 +1,5 @@
-XPVTraffic V 0.10 - Build 10 BETA
-(c) M.Burri - 02-Apr-2021
+XPVTraffic V 0.11 - Build 11 BETA
+(c) M.Burri - 19-Nov-2023
 
 Files & folders:
 
@@ -10,7 +10,7 @@ vfrScripts\*.vsc		- Script folder and files
 
 ReadMe.txt                   This file
 
-XPTsim (.Net 4.7.2)
+XPTsim (.Net 4.8)
 libXPVTgen_netstd(.Net Standard V2.0)
 
 Put all files into one folder and hit XPTsim.exe to run it.
@@ -24,8 +24,12 @@ Scanned for viruses before packing...
 bm98@burri-web.org
 
 Changelog:
+V 0.11Build11
+- update to use V2 RealTraffic comm spec, Port 49005 and RTTFC protocol
+
 V 0.10Build10
 - fix force application locale decimal sign to dot for number formatting
+
 V 0.9Build9
 - add conversion of AITraffic files to scripts
 - add a number of recorded ADS-B flights converted to relative scripts

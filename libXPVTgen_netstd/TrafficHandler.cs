@@ -211,7 +211,7 @@ namespace libXPVTgen
         POOL.Update( );
         // send updates to LiveTraffic - TODO need to pace it ??
         foreach ( var vac in POOL.AircraftPoolRef ) {
-          string msg = RealTraffic.AITrafficString( vac );
+          string msg = RealTraffic.RTTrafficString( vac );
           LT_Traffic.SendMsg( msg );
         }
         // recreates the airway selection if needed
